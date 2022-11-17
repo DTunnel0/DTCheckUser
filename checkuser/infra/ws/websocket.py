@@ -87,7 +87,7 @@ async def handler(websocket, path: str):
     body = await websocket.recv()
     logger.info('data: %s', body)
 
-    data = json.loads(await websocket.recv())
+    data = json.loads(body)
     controller = Controllers()[data['action']]
     reply = WebSocketAdapter.adapt(controller, data['data'])
 
