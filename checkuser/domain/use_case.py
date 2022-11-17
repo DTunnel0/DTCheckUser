@@ -9,7 +9,8 @@ class OutputDTO(NamedTuple):
     id: int
     username: str
     expiration_date: Union[None, datetime.datetime]
-    connection_count: int
+    limit_connections: int
+    count_connections: int
 
 
 class CheckUserUseCase:
@@ -24,7 +25,8 @@ class CheckUserUseCase:
             id=user.id,
             username=user.username,
             expiration_date=user.expiration_date,
-            connection_count=count,
+            limit_connections=user.connection_limit,
+            count_connections=count,
         )
 
 
