@@ -16,6 +16,21 @@ if ! [ -x "$(command -v git)" ]; then
     echo 'Git instalado com sucesso.'
 fi
 
+function install_checkuser_bin() {
+    local path='./executavel/checkuser'
+
+    cp "$path" /usr/bin/checkuser
+    chmod +x /usr/bin/checkuser
+
+    echo 'CheckUser instalado com sucesso.' read -p 'Porta: ' -e -i 5000 port
+    checkuser --port $port --start --daemon
+
+    echo 'CheckUser instalado com sucesso.'
+    echo 'Execute: checkuser --help'
+    echo 'URL: http://'$(curl -s icanhazip.com)':'$port
+    read
+}
+
 function install_checkuser() {
     echo 'Instalando CheckUser...'
 
@@ -76,7 +91,8 @@ function console_menu() {
 
     case $option in
     01 | 1)
-        install_checkuser
+        # install_checkuser
+        install_checkuser_bin
         console_menu
         ;;
     02 | 2)
