@@ -87,4 +87,7 @@ async def handler(websocket, path: str):
     await websocket.send(reply)
 
 
-app = websockets.serve(handler, "localhost", 8001)
+def create_app(host: str = '0.0.0.0', port: int = 5000):
+    print('Websocket server running on {}:{}'.format(host, port))
+    app = websockets.serve(handler, host, port)
+    return app

@@ -5,17 +5,19 @@ from . import args
 from .daemon import Daemon
 
 try:
+    use_flask = True
     from .infra.http.flask import app as flask_app
 except ImportError:
-    flask_app = None  # type: ignore
+    use_flask = False
 
 try:
-    from .infra.http.websocket import app as websocket_app
+    websocket_app = True
+    from .infra.http.websocket import create_app as create_websocket_app
 except ImportError:
-    websocket_app = None  # type: ignore
+    websocket_app = False
 
-if flask_app is None and websocket_app is None:
-    print('Flask and websocket are not installed')
+if not use_flask and not websocket_app:
+    print('Please install Flask or Websocket')
     sys.exit(1)
 
 
@@ -39,7 +41,12 @@ def main():
             if data.flask:
                 flask_app.run(host=data.host, port=data.port, debug=True)
             elif data.websocket:
-                asyncio.get_event_loop().run_until_complete(websocket_app)
+                asyncio.get_event_loop().run_until_complete(
+                    create_websocket_app(
+                        data.host,
+                        data.port,
+                    )
+                )
                 asyncio.get_event_loop().run_forever()
             else:
                 raise Exception('No server selected')
