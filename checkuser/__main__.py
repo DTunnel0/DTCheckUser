@@ -1,5 +1,3 @@
-import sys
-import asyncio
 import logging
 
 from . import args
@@ -20,7 +18,7 @@ args.add_argument('--daemon', '-d', action='store_true', help='Run as daemon')
 args.add_argument('--log', '-l', type=str, help='LogLevel', default='INFO')
 
 
-def main():
+def main(debug=True):
     data = args.parse_args()
 
     logging.basicConfig(
@@ -34,7 +32,7 @@ def main():
             app.run(
                 host=data.host,
                 port=data.port,
-                debug=True,
+                debug=debug,
             )
 
     daemon = ServerDaemon('/tmp/checkuser.pid')
