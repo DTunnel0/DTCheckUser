@@ -1,5 +1,6 @@
 import sys
 import asyncio
+import logging
 
 from . import args
 from .daemon import Daemon
@@ -12,7 +13,7 @@ except ImportError:
 
 try:
     websocket_app = True
-    from .infra.http.websocket import create_app as create_websocket_app
+    from .infra.ws.websocket import create_app as create_websocket_app
 except ImportError:
     websocket_app = False
 
@@ -32,9 +33,16 @@ args.add_argument('--websocket', '-w', action='store_true', help='Run websockets
 
 args.add_argument('--daemon', '-d', action='store_true', help='Run as daemon')
 
+args.add_argument('--log', '-l', type=str, help='LogLevel', default='INFO')
+
 
 def main():
     data = args.parse_args()
+
+    logging.basicConfig(
+        level=getattr(logging, data.log.upper()),
+        format='%(asctime)s - %(message)s',
+    )
 
     class ServerDaemon(Daemon):
         def run(self):

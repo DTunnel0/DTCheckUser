@@ -1,5 +1,6 @@
 import websockets
 import json
+import logging
 
 from checkuser.infra.controller import Controller
 from checkuser.infra.controllers.check_user import CheckUserController
@@ -19,6 +20,8 @@ from checkuser.data.connection import (
 )
 
 from checkuser.infra.adapter import WebSocketAdapter
+
+logger = logging.getLogger(__name__)
 
 
 def make_controller() -> CheckUserController:
@@ -81,13 +84,17 @@ class Controllers:
 
 
 async def handler(websocket, path: str):
+    body = await websocket.recv()
+    logger.info('data: %s', body)
+
     data = json.loads(await websocket.recv())
     controller = Controllers()[data['action']]
     reply = WebSocketAdapter.adapt(controller, data['data'])
+
+    logger.info('reply: %s', reply)
     await websocket.send(reply)
 
 
 def create_app(host: str = '0.0.0.0', port: int = 5000):
-    print('Websocket server running on {}:{}'.format(host, port))
     app = websockets.serve(handler, host, port)
     return app
