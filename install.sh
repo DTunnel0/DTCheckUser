@@ -6,6 +6,7 @@ cd ~
 function install_checkuser() {
     if [ -x "$(command -v checkuser)" ]; then
         echo 'CheckUser ja esta instalado.'
+        read
         return
     fi
 
@@ -27,7 +28,9 @@ function install_checkuser() {
 function uninstall_checkuser() {
     echo 'Desinstalando CheckUser...'
     checkuser --stop
-    sudo rm /usr/bin/checkuser
+    rm -rf $(which checkuser)
+    echo 'CheckUser desinstalado com sucesso.'
+    read
 }
 
 function reinstall_checkuser() {
