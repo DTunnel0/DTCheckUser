@@ -1,6 +1,9 @@
 import argparse
 import logging
 
+from .infra.http.flask import app
+from .infra.ws.websocket import socketio
+
 logger = logging.getLogger(__name__)
 
 __version__ = '2.2.13'

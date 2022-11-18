@@ -1,10 +1,13 @@
 import logging
 
-from . import args
+from . import args, app, socketio
 from .daemon import Daemon
 
-from .infra.http.flask import app
-from .infra.ws.websocket import socketio
+try:
+    use_waitress = True
+    from waitress import serve
+except ImportError:
+    use_waitress = False
 
 args.add_argument('--host', type=str, help='Host to listen', default='0.0.0.0')
 args.add_argument('--port', '-p', type=int, help='Port', default=5000)
@@ -29,11 +32,14 @@ def main(debug=True):
     class ServerDaemon(Daemon):
         def run(self):
             socketio.init_app(app)
-            app.run(
-                host=data.host,
-                port=data.port,
-                debug=debug,
-            )
+            if use_waitress:
+                serve(app, host=data.host, port=data.port)
+            else:
+                app.run(
+                    host=data.host,
+                    port=data.port,
+                    debug=debug,
+                )
 
     daemon = ServerDaemon('/tmp/checkuser.pid')
     if not data.daemon and data.start:
