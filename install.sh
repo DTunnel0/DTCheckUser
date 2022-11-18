@@ -21,7 +21,11 @@ function install_checkuser() {
 
     echo 'CheckUser instalado com sucesso.'
     echo 'Execute: checkuser --help'
-    echo 'URL: http://'$(curl -s icanhazip.com)':'$port
+
+    addr=$(curl -s icanhazip.com)
+
+    echo 'URL: http://'$addr':'$port''
+    echo 'WS: ws://'$addr':'$port''
     read
 }
 
