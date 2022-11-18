@@ -1,48 +1,18 @@
 url='https://github.com/DTunnel0/DTCheckUser'
+checkuser='https://github.com/DTunnel0/DTCheckUser/raw/master/executable/checkuser'
 
 cd ~
 
-if ! [ -x "$(command -v git)" ]; then
-    echo 'Erro: git nao esta instalado.' >&2
-    echo 'Instalando Git...'
-
-    sudo apt-get install git -y 1>/dev/null 2>/dev/null
-
-    if ! [ -x "$(command -v git)" ]; then
-        echo 'Erro: git nao esta instalado.' >&2
-        exit 1
-    fi
-
-    echo 'Git instalado com sucesso.'
-fi
-
-function install_checkuser_bin() {
-    local path='./executavel/checkuser'
-
-    cp "$path" /usr/bin/checkuser
-    chmod +x /usr/bin/checkuser
-
-    echo 'CheckUser instalado com sucesso.' read -p 'Porta: ' -e -i 5000 port
-    checkuser --port $port --start --daemon
-
-    echo 'CheckUser instalado com sucesso.'
-    echo 'Execute: checkuser --help'
-    echo 'URL: http://'$(curl -s icanhazip.com)':'$port
-    read
-}
-
 function install_checkuser() {
-    echo 'Instalando CheckUser...'
-
-    git clone $url
-    cd CheckUser
-
-    python3 setup.py install
-
-    if ! [ -x "$(command -v checkuser)" ]; then
-        echo 'Erro: CheckUser nao esta instalado.' >&2
-        exit 1
+    if [ -x "$(command -v checkuser)" ]; then
+        echo 'CheckUser ja esta instalado.'
+        return
     fi
+
+    echo 'Instalando CheckUser...'
+    wget $checkuser -O checkuser
+    chmod +x checkuser
+    sudo mv checkuser /usr/bin/checkuser
 
     clear
     read -p 'Porta: ' -e -i 5000 port
@@ -56,22 +26,8 @@ function install_checkuser() {
 
 function uninstall_checkuser() {
     echo 'Desinstalando CheckUser...'
-
     checkuser --stop
-
-    [[ -d CheckUser ]] && rm -rf CheckUser
-
-    [[ -f /usr/bin/checker ]] && {
-        service check_user stop
-        /usr/bin/checker --uninstall
-        rm /usr/bin/checker
-    }
-
-    [[ -f /usr/local/bin/checkuser ]] && {
-        service check_user stop
-        /usr/local/bin/checkuser --remove-service
-        rm /usr/local/bin/checkuser
-    }
+    sudo rm /usr/bin/checkuser
 }
 
 function reinstall_checkuser() {
@@ -91,8 +47,7 @@ function console_menu() {
 
     case $option in
     01 | 1)
-        # install_checkuser
-        install_checkuser_bin
+        install_checkuser
         console_menu
         ;;
     02 | 2)
@@ -119,17 +74,16 @@ function console_menu() {
 function main() {
     case $1 in
     install)
-        # install_checkuser
-        install_checkuser_bin
-        ;;
-    update)
-        check_update
+        install_checkuser
         ;;
     uninstall)
         uninstall_checkuser
         ;;
+    reinstall)
+        reinstall_checkuser
+        ;;
     *)
-        echo 'Usage: ./install.sh [install|update|uninstall]'
+        echo 'Usage: ./install.sh [install|uninstall|reinstall]'
         exit 1
         ;;
     esac
