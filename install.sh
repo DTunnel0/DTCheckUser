@@ -1,4 +1,4 @@
-url='https://github.com/DuTra01/CheckUser'
+url='https://github.com/DTunnel0/DTCheckUser'
 
 cd ~
 
@@ -119,7 +119,8 @@ function console_menu() {
 function main() {
     case $1 in
     install)
-        install_checkuser
+        # install_checkuser
+        install_checkuser_bin
         ;;
     update)
         check_update
