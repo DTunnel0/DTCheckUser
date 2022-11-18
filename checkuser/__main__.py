@@ -1,13 +1,17 @@
 import logging
 
-from . import args, app, socketio
+from . import args, app, socketio,logger
 from .daemon import Daemon
 
+
 try:
-    use_waitress = True
-    from waitress import serve
+    use_eventlet = True
+    from gevent import monkey
+    monkey.patch_all()
+
+    from gevent.pywsgi import WSGIServer
 except ImportError:
-    use_waitress = False
+    use_eventlet = False
 
 args.add_argument('--host', type=str, help='Host to listen', default='0.0.0.0')
 args.add_argument('--port', '-p', type=int, help='Port', default=5000)
@@ -32,8 +36,10 @@ def main(debug=True):
     class ServerDaemon(Daemon):
         def run(self):
             socketio.init_app(app)
-            if use_waitress:
-                serve(app, host=data.host, port=data.port)
+            if use_eventlet:
+                logger.info('Running on {}:{}'.format(data.host, data.port))
+                http_server = WSGIServer((data.host, data.port), app)
+                http_server.serve_forever()
             else:
                 app.run(
                     host=data.host,

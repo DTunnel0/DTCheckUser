@@ -3,6 +3,8 @@ start:
 
 clean:
 	rm -rf build dist *.egg-info
+	rm -rf ./executable/*
+	rm -rf *.spec
 
 release:
 	pyinstaller -D -F -n checkuser -c main.py
