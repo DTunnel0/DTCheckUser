@@ -1,17 +1,17 @@
 import logging
 
-from . import args, app, socketio,logger
+
+from .infra.ws.socketio import socketio as io
+from . import args, app, socketio
 from .daemon import Daemon
 
 
 try:
-    use_eventlet = True
     from gevent import monkey
-    monkey.patch_all()
 
-    from gevent.pywsgi import WSGIServer
+    monkey.patch_all()
 except ImportError:
-    use_eventlet = False
+    pass
 
 args.add_argument('--host', type=str, help='Host to listen', default='0.0.0.0')
 args.add_argument('--port', '-p', type=int, help='Port', default=5000)
@@ -36,16 +36,13 @@ def main(debug=True):
     class ServerDaemon(Daemon):
         def run(self):
             socketio.init_app(app)
-            if use_eventlet:
-                logger.info('Running on {}:{}'.format(data.host, data.port))
-                http_server = WSGIServer((data.host, data.port), app)
-                http_server.serve_forever()
-            else:
-                app.run(
-                    host=data.host,
-                    port=data.port,
-                    debug=debug,
-                )
+            io.init_app(app)
+            io.run(
+                app,
+                host=data.host,
+                port=data.port,
+                debug=debug,
+            )
 
     daemon = ServerDaemon('/tmp/checkuser.pid')
     if not data.daemon and data.start:
