@@ -23,7 +23,7 @@ def on_message(data: dict) -> None:
     emit('message', response)
 
 
-@socketio.on('limiter', namespace='/limiter')
+@socketio.on('limiter')
 def on_limiter(data: dict) -> None:
     logger.info('-' * 50)
     logger.info('[CONNECTED] IP: %s', request.remote_addr)
