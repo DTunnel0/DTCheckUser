@@ -51,15 +51,14 @@ def on_limiter(data: dict) -> None:
 
 @socketio.on('disconnect')
 def on_disconnect() -> None:
-    for username, sid in connections.items():
-        if sid == request.sid:
-            del connections[username]
-            break
-
-    logger.info('-' * 50)
-    logger.info('[DISCONNECT] IP: %s', request.remote_addr)
-    logger.info('[DISCONNECT] SID: %s', request.sid)
-    logger.info('[DISCONNECT] USERNAME: %s', username)
+    for username, sids in connections.items():
+        if request.sid in sids:
+            connections[username].remove(request.sid)
+            logger.info('-' * 50)
+            logger.info('[DISCONNECTED] IP: %s', request.remote_addr)
+            logger.info('[DISCONNECTED] SID: %s', request.sid)
+            logger.info('[DISCONNECTED] USERNAME: %s', username)
+            logger.info('[DISCONNECTED] CONEXOES RESTANTES: %s', len(connections[username]))
     logger.info('-' * 50)
 
     emit('message', {'status': 'success', 'message': 'Desconectado com sucesso'})
