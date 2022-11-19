@@ -30,12 +30,17 @@ def on_limiter(data: dict) -> None:
     logger.info('-' * 50)
 
     username = data['data']['username']
-    if username in connections:
+    if username in connections and len(connections[username]) >= 1:
+        logger.info('Numero de conexões excedido')
         emit('limiter', {'status': 'reached', 'message': 'Numero de conexões excedido'})
         return
 
-    connections[username] = request.sid
+    if not connections.get(username):
+        connections[username] = []
+
+    connections[username].append(request.sid)
     emit('limiter', {'status': 'success', 'message': 'Conexão realizada com sucesso'})
+    logger.info('Conexão realizada com sucesso')
 
 
 @socketio.on('disconnect')
