@@ -32,11 +32,11 @@ def on_limiter(data: dict) -> None:
 
     username = data['data']['username']
     if username in connections:
-        emit('message', {'status': 'error', 'message': 'Limite de conexões atingido'})
+        emit('limiter', {'status': 'error', 'message': 'Limite de conexões atingido'})
         return
 
     connections[username] = request.sid
-    emit('message', {'status': 'success', 'message': 'Conexão realizada com sucesso'})
+    emit('limiter', {'status': 'success', 'message': 'Conexão realizada com sucesso'})
 
 
 @socketio.on('disconnect')
