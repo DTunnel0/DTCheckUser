@@ -15,8 +15,11 @@ connections = {}
 
 @socketio.on('message')
 def on_message(data: dict) -> None:
+    logger.info('-' * 50)
     logger.info('IP: %s', request.remote_addr)
     logger.info('SID: %s', request.sid)
+    logger.info('ACTION: %s', data['action'])
+    logger.info('-' * 50)
 
     response = WebSocketAdapter.adapt(Controllers.get(data['action']), data['data'])
     emit('message', response)
@@ -27,11 +30,12 @@ def on_limiter(data: dict) -> None:
     logger.info('-' * 50)
     logger.info('[CONNECTED] IP: %s', request.remote_addr)
     logger.info('[CONNECTED] SID: %s', request.sid)
-    logger.info('-' * 50)
 
     username = data['data']['username']
     if username in connections and len(connections[username]) >= 1:
-        logger.info('Numero de conexões excedido')
+        logger.info('[CONNECTED] USERNAME: %s', username)
+        logger.info('-' * 50)
+
         emit('limiter', {'status': 'reached', 'message': 'Numero de conexões excedido'})
         return
 
@@ -41,6 +45,7 @@ def on_limiter(data: dict) -> None:
     connections[username].append(request.sid)
     emit('limiter', {'status': 'success', 'message': 'Conexão realizada com sucesso'})
     logger.info('Conexão realizada com sucesso')
+    logger.info('-' * 50)
 
 
 @socketio.on('disconnect')
@@ -53,6 +58,7 @@ def on_disconnect() -> None:
     logger.info('-' * 50)
     logger.info('[DISCONNECT] IP: %s', request.remote_addr)
     logger.info('[DISCONNECT] SID: %s', request.sid)
+    logger.info('[DISCONNECT] USERNAME: %s', username)
     logger.info('-' * 50)
 
     emit('message', {'status': 'success', 'message': 'Desconectado com sucesso'})
