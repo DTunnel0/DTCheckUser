@@ -59,6 +59,7 @@ def on_disconnect() -> None:
             logger.info('[DISCONNECTED] SID: %s', request.sid)
             logger.info('[DISCONNECTED] USERNAME: %s', username)
             logger.info('[DISCONNECTED] CONEXOES RESTANTES: %s', len(connections[username]))
-    logger.info('-' * 50)
+            logger.info('-' * 50)
+            break
 
     emit('message', {'status': 'success', 'message': 'Desconectado com sucesso'})
