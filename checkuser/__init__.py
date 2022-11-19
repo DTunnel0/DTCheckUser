@@ -2,7 +2,8 @@ import argparse
 import logging
 
 from .infra.http.flask import app
-from .infra.ws.websocket import socketio
+from .infra.ws.websocket import ws
+from .infra.ws.socketio import io
 
 logger = logging.getLogger(__name__)
 

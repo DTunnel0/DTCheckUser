@@ -1,5 +1,3 @@
-# type: ignore
-
 import logging
 
 from flask import request
@@ -7,13 +5,13 @@ from flask_socketio import SocketIO, emit
 from checkuser.infra.factories.make_controller import Controllers
 from checkuser.infra.adapter import WebSocketAdapter
 
-socketio = SocketIO(cors_allowed_origins='*')
+io = SocketIO(cors_allowed_origins='*')
 logger = logging.getLogger(__name__)
 
 connections = {}
 
 
-@socketio.on('message')
+@io.on('message')
 def on_message(data: dict) -> None:
     logger.info('-' * 50)
     logger.info('[IP] -> %s', request.remote_addr)
@@ -25,7 +23,7 @@ def on_message(data: dict) -> None:
     emit('message', response)
 
 
-@socketio.on('limiter')
+@io.on('limiter')
 def on_limiter(data: dict) -> None:
     username = data['data']['username']
 
@@ -49,7 +47,7 @@ def on_limiter(data: dict) -> None:
     logger.info('-' * 50)
 
 
-@socketio.on('disconnect')
+@io.on('disconnect')
 def on_disconnect() -> None:
     for username, sids in connections.items():
         if request.sid in sids:
