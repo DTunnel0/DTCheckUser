@@ -23,31 +23,30 @@ class SSHConnection(Connection):
 
 
 class AUXOpenVPNConnection:
+    __socket: socket.socket
+
     def __init__(self, host: str = '127.0.0.1', port: int = 7505) -> None:
         self.host = host
         self.port = port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    def connect(self) -> None:
-        self.socket.connect((self.host, self.port))
 
     def send(self, data: str) -> None:
-        self.socket.send(data.encode())
+        self.__socket.send(data.encode())
 
     def receive(self, size: int = 1024) -> str:
         data = b''
-        chunk = self.socket.recv(size)
+        chunk = self.__socket.recv(size)
         while chunk.count(b'\r\nEND\r\n') == 0:
             data += chunk
-            chunk = self.socket.recv(size)
+            chunk = self.__socket.recv(size)
         data += chunk
         return data.decode()
 
     def close(self) -> None:
-        self.socket.close()
+        self.__socket.close()
 
     def __enter__(self) -> 'AUXOpenVPNConnection':
-        self.connect()
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__socket.connect((self.host, self.port))
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
