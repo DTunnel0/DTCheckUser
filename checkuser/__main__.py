@@ -1,7 +1,6 @@
 import logging
 
-
-from . import args, app, ws, io
+from . import args, app, ws, io, logger
 from .daemon import Daemon
 
 try:
@@ -16,6 +15,7 @@ args.add_argument('--host', type=str, help='Host to listen', default='0.0.0.0')
 args.add_argument('--port', '-p', type=int, help='Port', default=5000)
 
 args.add_argument('--start', action='store_true', help='Start the daemon')
+args.add_argument('--status', '-s', action='store_true', help='Server status')
 args.add_argument('--stop', '-t', action='store_true', help='Stop server')
 args.add_argument('--restart', '-r', action='store_true', help='Restart server')
 
@@ -39,6 +39,15 @@ def main(debug: bool = True) -> None:
             io.run(app, host=data.host, port=data.port, debug=debug)
 
     daemon = ServerDaemon('/tmp/checkuser.pid')
+    if data.status:
+        if daemon.is_running():
+            logger.info('Server is running')
+            logger.info('PID: {}'.format(daemon.get_pid()))
+            return
+
+        logger.info('Server is not running')
+        return
+
     if not data.daemon and data.start:
         daemon.run()
         return

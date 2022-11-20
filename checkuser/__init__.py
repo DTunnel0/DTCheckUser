@@ -7,11 +7,18 @@ from .infra.ws.socketio import io
 
 logger = logging.getLogger(__name__)
 
-__version__ = '2.2.14'
+__version__ = '1.1.1'
 __author__ = 'Glemison C. Dutra'
 __email__ = 'glemyson20@gmail.com'
 
-args = argparse.ArgumentParser(description='Checker for OpenVPN and SSH')
+__description__ = (
+    'DTChecker - CHECKUSER | '
+    'BY ' + __author__ + ' <' + __email__ + '> | '
+    'VERSION: ' + __version__
+)
+
+
+args = argparse.ArgumentParser(description=__description__)
 args.add_argument(
     '-v',
     '--version',
