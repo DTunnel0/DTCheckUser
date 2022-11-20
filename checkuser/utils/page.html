@@ -123,7 +123,7 @@
         $(document).ready(function () {
             const namespace = 'ws://w.dutra01.xyz:5000';
             // const namespace = 'ws://127.0.0.1:5000';
-            const socket = io(namespace);
+            const socket = io();
             socket.on('message', function (data) {
                 data = JSON.parse(data);
 
