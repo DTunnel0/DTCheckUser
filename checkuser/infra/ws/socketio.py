@@ -16,6 +16,7 @@ def _get_session_id() -> str:
 @io.on('message')
 def on_message(data: dict) -> None:
     logger.info('-' * 50)
+    logger.info('[SOCKETIO SERVER]')
     logger.info('[IP] -> %s', request.remote_addr)
     logger.info('[SID] -> %s', _get_session_id())
     logger.info('[ACTION] -> %s', data['action'])
