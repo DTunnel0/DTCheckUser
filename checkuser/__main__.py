@@ -4,14 +4,6 @@ import logging
 from . import args, app, ws, io
 from .daemon import Daemon
 
-
-# try:
-#     from gevent import monkey
-
-#     monkey.patch_all()
-# except ImportError:
-#     pass
-
 args.add_argument('--host', type=str, help='Host to listen', default='0.0.0.0')
 args.add_argument('--port', '-p', type=int, help='Port', default=5000)
 
