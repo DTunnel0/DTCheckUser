@@ -60,21 +60,25 @@ class OpenVPNConnection(Connection):
 
     def count(self, username: str) -> int:
         try:
-            self.connection.send('status\n')
-            data = self.connection.receive()
-            count = data.count(username)
-            return count // 2 if count > 0 else 0
+            with self.connection:
+                self.connection.send('status\n')
+                data = self.connection.receive()
+                count = data.count(username)
+                return count // 2 if count > 0 else 0
         except Exception:
+            raise
             return 0
 
     def kill(self, username: str) -> None:
-        self.connection.send('kill {}\n'.format(username))
+        with self.connection:
+            self.connection.send('kill {}\n'.format(username))
 
     def all(self) -> int:
         try:
-            self.connection.send('status\n')
-            data = self.connection.receive()
-            return len(data.splitlines()) - 2
+            with self.connection:
+                self.connection.send('status\n')
+                data = self.connection.receive()
+                return len(data.splitlines()) - 2
         except Exception:
             return 0
 
