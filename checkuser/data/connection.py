@@ -14,7 +14,7 @@ class SSHConnection(Connection):
         return int(self.executor.execute(cmd))
 
     def kill(self, username: str) -> None:
-        cmd = 'pkill -u {}'.format(username)
+        cmd = 'kill -9 $(ps -u {} | grep sshd | awk \'{{print $1}}\')'.format(username)
         self.executor.execute(cmd)
 
     def all(self) -> int:
