@@ -4,6 +4,15 @@ import logging
 from . import args, app, ws, io
 from .daemon import Daemon
 
+try:
+    from engineio.async_drivers import gevent
+    from gevent import monkey
+
+    monkey.patch_all()
+except ImportError:
+    pass
+
+
 args.add_argument('--host', type=str, help='Host to listen', default='0.0.0.0')
 args.add_argument('--port', '-p', type=int, help='Port', default=5000)
 
@@ -16,7 +25,7 @@ args.add_argument('--daemon', '-d', action='store_true', help='Run as daemon')
 args.add_argument('--log', '-l', type=str, help='LogLevel', default='INFO')
 
 
-def main(debug=True):
+def main(debug: bool = True) -> None:
     data = args.parse_args()
 
     logging.basicConfig(
@@ -26,14 +35,9 @@ def main(debug=True):
 
     class ServerDaemon(Daemon):
         def run(self):
-            ws.init_app(app)
             io.init_app(app)
-            io.run(
-                app,
-                host=data.host,
-                port=data.port,
-                debug=debug,
-            )
+            ws.init_app(app)
+            io.run(app, host=data.host, port=data.port, debug=debug)
 
     daemon = ServerDaemon('/tmp/checkuser.pid')
     if not data.daemon and data.start:

@@ -4,7 +4,7 @@ clean:
 	rm -rf *.spec
 	rm -rf ./virtualenv
 
-release:
+build:
 	$(MAKE) clean
 
 	@echo 'Releasing...'
@@ -13,6 +13,7 @@ release:
 	python3 -m venv virtualenv
 	./virtualenv/bin/pip install -r requirements.txt
 	./virtualenv/bin/pip install gevent
+	./virtualenv/bin/pip install gevent-websocket
 	./virtualenv/bin/pip install pyinstaller
 	./virtualenv/bin/pyinstaller -D -F -n checkuser -c main.py
 	

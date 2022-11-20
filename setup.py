@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from checkuser import __version__, __author__, __email__
 
 PACKAGES = find_packages()
-REQUIREMENTS = []  # open('requirements.txt').read().splitlines()
+REQUIREMENTS = ['flask', 'flask-sock', 'flask-socketio']
 VERSION = __version__
 
 DESCRIPTION = open('README.md').read()
@@ -12,7 +12,7 @@ URL = 'https://github.com/DTunnel0/DTCheckUser'
 LICENSE = 'MIT'
 
 setup(
-    name='CheckerUser',
+    name='CheckUser',
     version=VERSION,
     long_description=DESCRIPTION,
     long_description_content_type='text/markdown',
