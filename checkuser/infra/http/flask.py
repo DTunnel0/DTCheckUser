@@ -1,6 +1,8 @@
-from flask import Flask
+from flask import Flask, render_template_string
+
 from checkuser.infra.factories.make_controller import Controllers
 from checkuser.infra.adapter import FlaskAdpater
+from checkuser.utils import page_content
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -25,4 +27,11 @@ app.add_url_rule(
     methods=['GET'],
     endpoint='all',
     view_func=FlaskAdpater.adapt(Controllers.get('all')),
+)
+
+app.add_url_rule(
+    '/page',
+    methods=['GET'],
+    endpoint='page',
+    view_func=lambda: render_template_string(page_content()),
 )
