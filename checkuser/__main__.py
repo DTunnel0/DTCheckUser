@@ -5,13 +5,12 @@ from . import args, app, ws, io
 from .daemon import Daemon
 
 try:
-    from engineio.async_drivers import gevent
-    from gevent import monkey
+    from engineio.async_drivers import eventlet
+    from eventlet import monkey_patch
 
-    monkey.patch_all()
+    monkey_patch()
 except ImportError:
     pass
-
 
 args.add_argument('--host', type=str, help='Host to listen', default='0.0.0.0')
 args.add_argument('--port', '-p', type=int, help='Port', default=5000)
