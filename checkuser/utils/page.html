@@ -64,12 +64,33 @@
             flex-direction: column;
             margin-bottom: 50px;
         }
+
+        .container h1 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .container h4 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .container h4 span {
+            background: #363636;
+            padding: 5px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+        }
     </style>
 
 </head>
 
 <body>
     <div class="container">
+        <h1>CHECKUSER - @DuTra01</h1>
+
         <div class="search">
             <label for="search">Buscar usuario</label>
             <input type="text" id="search" placeholder="Nome de usuario">
@@ -90,6 +111,7 @@
             <label for="expires">Data de expiração</label>
             <input type="text" id="expires" name="expires" readonly />
         </div>
+        <h4>TOTAL DE CONEXÕES: <span id="total">0</span></h4>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
@@ -99,10 +121,17 @@
         crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function () {
-            const socket = io();
+            const namespace = 'ws://w.dutra01.xyz:5000';
+            // const namespace = 'ws://127.0.0.1:5000';
+            const socket = io(namespace);
             socket.on('message', function (data) {
-                console.log(data);
                 data = JSON.parse(data);
+
+                if (data.total != undefined) {
+                    $('#total').text(data.total);
+                    return;
+                }
+
                 cleanFields();
 
                 if (!data.username)
@@ -112,6 +141,11 @@
                 $('#limit').val(data.limit_connections);
                 $('#current').val(data.count_connections);
                 $('#expires').val(data.expiration_date + ' - ' + data.expiration_days + ' dias');
+            });
+
+            socket.emit('message', {
+                action: 'all',
+                data: null
             });
 
             function cleanFields() {
