@@ -1,4 +1,5 @@
 import socket
+import re
 
 from typing import List
 from checkuser.data.executor import CommandExecutor
@@ -77,7 +78,8 @@ class OpenVPNConnection(Connection):
             with self.connection:
                 self.connection.send('status\n')
                 data = self.connection.receive()
-                return len(data.splitlines()) - 2
+                pattern = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3},\w+,)')
+                return len(pattern.findall(data))
         except Exception:
             return 0
 
