@@ -66,7 +66,6 @@ class OpenVPNConnection(Connection):
                 count = data.count(username)
                 return count // 2 if count > 0 else 0
         except Exception:
-            raise
             return 0
 
     def kill(self, username: str) -> None:
