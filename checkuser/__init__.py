@@ -7,7 +7,7 @@ from .infra.ws.socketio import io
 
 logger = logging.getLogger(__name__)
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 __author__ = 'Glemison C. Dutra'
 __email__ = 'glemyson20@gmail.com'
 
