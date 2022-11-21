@@ -102,8 +102,8 @@ class V2rayConnection(Connection):
             'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
             % self.__port
         )
+        print(cmd)
         addresses = self.executor.execute(cmd).splitlines()
-        print(addresses)
         data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
         for address in addresses:
             pattern = r'%s.*email: %s' % (address, username)
