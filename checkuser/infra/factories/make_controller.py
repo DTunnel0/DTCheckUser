@@ -9,13 +9,10 @@ from checkuser.data.repository import UserRepositoryImpl, InMemoryUserRepository
 from checkuser.domain.use_case import CheckUserUseCase, KillConnectionUseCase, AllConnectionsUseCase
 from checkuser.data.connection import (
     AUXOpenVPNConnection,
-    ConnectionImpl,
     SSHConnection,
     OpenVPNConnection,
-    InMemoryConnection,
+    V2rayConnection,
 )
-
-from checkuser.infra.adapter import WebSocketAdapter
 
 
 def make_controller() -> CheckUserController:
@@ -25,45 +22,39 @@ def make_controller() -> CheckUserController:
             FormatDateUS(),
         ),
     )
-    connection = ConnectionImpl(
-        [
-            SSHConnection(CommandExecutorImpl()),
-            OpenVPNConnection(AUXOpenVPNConnection()),
-        ]
+
+    return CheckUserController(
+        CheckUserUseCase(
+            repository,
+            [
+                SSHConnection(CommandExecutorImpl()),
+                OpenVPNConnection(AUXOpenVPNConnection()),
+                V2rayConnection(CommandExecutorImpl()),
+            ],
+        )
     )
-
-    # return CheckUserController(
-    #     CheckUserUseCase(
-    #         InMemoryUserRepository(),
-    #         InMemoryConnection(),
-    #     )
-    # )
-
-    return CheckUserController(CheckUserUseCase(repository, connection))
 
 
 def make_kill_controller() -> KillConnectionController:
-    connection = ConnectionImpl(
-        [
-            SSHConnection(CommandExecutorImpl()),
-            OpenVPNConnection(AUXOpenVPNConnection()),
-        ]
+    return KillConnectionController(
+        KillConnectionUseCase(
+            [
+                SSHConnection(CommandExecutorImpl()),
+                OpenVPNConnection(AUXOpenVPNConnection()),
+            ]
+        )
     )
-
-    # return KillConnectionController(KillConnectionUseCase(InMemoryConnection()))
-    return KillConnectionController(KillConnectionUseCase(connection))
 
 
 def make_all_controller() -> AllConnectionsController:
-    connection = ConnectionImpl(
-        [
-            SSHConnection(CommandExecutorImpl()),
-            OpenVPNConnection(AUXOpenVPNConnection()),
-        ]
+    return AllConnectionsController(
+        AllConnectionsUseCase(
+            [
+                SSHConnection(CommandExecutorImpl()),
+                OpenVPNConnection(AUXOpenVPNConnection()),
+            ]
+        )
     )
-
-    return AllConnectionsController(AllConnectionsUseCase(connection))
-    # return AllConnectionsController(AllConnectionsUseCase(InMemoryConnection()))
 
 
 class Controllers:

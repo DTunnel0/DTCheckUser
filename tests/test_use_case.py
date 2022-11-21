@@ -16,7 +16,7 @@ def test_should_check_user():
     connection_count = Mock()
     connection_count.count.return_value = 5
 
-    use_case = CheckUserUseCase(repository, connection_count)
+    use_case = CheckUserUseCase(repository, [connection_count])
     output_dto = use_case.execute('test')
 
     assert output_dto.id == 1000

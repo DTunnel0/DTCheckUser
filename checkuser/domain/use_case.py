@@ -1,7 +1,7 @@
 import datetime
 
-from typing import Union, NamedTuple
-from checkuser.domain.connection import Connection
+from typing import Union, NamedTuple, List
+from checkuser.domain.connection import Connection, ConnectionKill
 from checkuser.domain.repository import UserRepository
 
 
@@ -14,13 +14,13 @@ class OutputDTO(NamedTuple):
 
 
 class CheckUserUseCase:
-    def __init__(self, repository: UserRepository, connection: Connection):
+    def __init__(self, repository: UserRepository, connections: List[Connection]) -> None:
         self.repository = repository
-        self.connection = connection
+        self.connections = connections
 
     def execute(self, username: str) -> OutputDTO:
         user = self.repository.get_by_username(username)
-        count = self.connection.count(username)
+        count = sum([connection.count(username) for connection in self.connections])
         return OutputDTO(
             id=user.id,
             username=user.username,
@@ -31,16 +31,17 @@ class CheckUserUseCase:
 
 
 class KillConnectionUseCase:
-    def __init__(self, connection: Connection):
-        self.connection = connection
+    def __init__(self, connections: List[ConnectionKill]) -> None:
+        self.connections = connections
 
     def execute(self, username: str) -> None:
-        self.connection.kill(username)
+        for connection in self.connections:
+            connection.kill(username)
 
 
 class AllConnectionsUseCase:
-    def __init__(self, connection: Connection):
-        self.connection = connection
+    def __init__(self, connections: List[Connection]) -> None:
+        self.connections = connections
 
     def execute(self) -> int:
-        return self.connection.all()
+        return sum([connection.all() for connection in self.connections])

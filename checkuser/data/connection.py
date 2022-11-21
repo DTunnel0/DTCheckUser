@@ -1,12 +1,11 @@
 import socket
 import re
 
-from typing import List
 from checkuser.data.executor import CommandExecutor
-from checkuser.domain.connection import Connection
+from checkuser.domain.connection import Connection, ConnectionKill
 
 
-class SSHConnection(Connection):
+class SSHConnection(ConnectionKill):
     def __init__(self, executor: CommandExecutor):
         self.executor = executor
 
@@ -54,7 +53,7 @@ class AUXOpenVPNConnection:
         self.close()
 
 
-class OpenVPNConnection(Connection):
+class OpenVPNConnection(ConnectionKill):
     def __init__(self, connection: AUXOpenVPNConnection) -> None:
         self.connection = connection
 
@@ -83,22 +82,51 @@ class OpenVPNConnection(Connection):
             return 0
 
 
-class ConnectionImpl(Connection):
-    def __init__(self, counters: List[Connection]) -> None:
-        self.counters = counters
+class V2rayConnection(Connection):
+    __log_file = '/var/log/v2ray/access.log'
+
+    def __init__(self, executor: CommandExecutor):
+        self.executor = executor
+
+    def __find_v2ray_port(self) -> str:
+        cmd = 'netstat -tunlp | grep v2ray'
+        data = self.executor.execute(cmd).splitlines()[-1]
+        return data.split()[3].split(':')[-1]
+
+    @property
+    def __port(self) -> str:
+        return self.__find_v2ray_port()
 
     def count(self, username: str) -> int:
-        return sum([count.count(username) for count in self.counters])
-
-    def kill(self, username: str) -> None:
-        for count in self.counters:
-            count.kill(username)
+        cmd = (
+            'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
+            % self.__port
+        )
+        addresses = self.executor.execute(cmd).splitlines()
+        data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
+        for address in addresses:
+            pattern = r'%s.*email: %s' % (address, username)
+            if re.search(pattern, data):
+                return 1
+        return 0
 
     def all(self) -> int:
-        return sum([count.all() for count in self.counters])
+        cmd = (
+            'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
+            % self.__port
+        )
+        addresses = self.executor.execute(cmd).splitlines()
+        data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
+        emails = []
+        for address in addresses:
+            pattern = r'%s.*email: (\S+)' % address
+            email = re.search(pattern, data)
+            if email and email.group(1) not in emails:
+                emails.append(email.group(1))
+        return len(emails)
 
 
-class InMemoryConnection(Connection):
+class InMemoryConnection(ConnectionKill):
     def count(self, username: str) -> int:
         return len(username)
 
