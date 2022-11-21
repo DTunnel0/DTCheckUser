@@ -103,10 +103,10 @@ class V2rayConnection(Connection):
             % self.__port
         )
         addresses = self.executor.execute(cmd).splitlines()
+        print(addresses)
         data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
         for address in addresses:
             pattern = r'%s.*email: %s' % (address, username)
-            print(pattern)
             if re.search(pattern, data):
                 return 1
         return 0
