@@ -1,32 +1,67 @@
 url='https://github.com/DTunnel0/DTCheckUser'
 checkuser='https://github.com/DTunnel0/DTCheckUser/raw/master/executable/checkuser'
+depends=('git' 'python3' 'python3-pip' 'python3-setuptools' 'python3-dev')
 
 cd ~
 
-function install_checkuser() {
-    if [ -x "$(command -v checkuser)" ]; then
-        echo 'CheckUser ja esta instalado.'
-        read
-        return
+function install_dependencies() {
+    for depend in ${depends[@]}; do
+        if ! command -v $depend &>/dev/null; then
+            echo "Instalando dependencia $depend"
+        fi
+    done
+}
+
+function compile_checkuser() {
+    if ! command -v checkuser &>/dev/null; then
+        echo "Compilando checkuser"
+        git clone $url
+        cd DTCheckUser
+        sudo python3 setup.py install
+        cd ..
+        rm -rf DTCheckUser
     fi
+}
 
-    echo 'Instalando CheckUser...'
-    wget $checkuser -O checkuser
-    chmod +x checkuser
-    sudo mv checkuser /usr/bin/checkuser
+function install_binary() {
+    if ! command -v checkuser &>/dev/null; then
+        echo "Instalando binario checkuser"
+        sudo wget $checkuser -O /usr/bin/checkuser
+        sudo chmod +x /usr/bin/checkuser
+    fi
+}
 
-    clear
+function start_checkuser() {
     read -p 'Porta: ' -e -i 5000 port
     checkuser --port $port --start --daemon
-
-    echo 'CheckUser instalado com sucesso.'
-    echo 'Execute: checkuser --help'
 
     addr=$(curl -s icanhazip.com)
 
     echo 'URL: http://'$addr':'$port''
     echo 'WS: ws://'$addr':'$port''
     read
+}
+
+function initialize_process_install() {
+    local mode=$1
+
+    if [[ $mode == 'binary' ]]; then
+        install_binary
+    elif [[ $mode == 'compile' ]]; then
+        install_dependencies
+        compile_checkuser
+    else
+        echo "Modo de instalacao invalido"
+        exit 1
+    fi
+
+    if command -v checkuser &>/dev/null; then
+        echo "checkuser instalado com sucesso"
+        start_checkuser
+    else
+        echo "Falha ao instalar checkuser"
+        exit 1
+    fi
 }
 
 function uninstall_checkuser() {
@@ -45,24 +80,24 @@ function reinstall_checkuser() {
 function console_menu() {
     clear
     echo 'CHECKUSER MENU'
-    echo '[01] - Instalar CheckUser'
-    echo '[02] - Desinstalar CheckUser'
-    echo '[03] - Reinstalar CheckUser'
+    echo '[01] - INSTALAR CHECKUSER (BINARIO)'
+    echo '[02] - INSTALAR CHECKUSER (COMPILAR)'
+    echo '[03] - DESINSTALAR CHECKUSER'
     echo '[00] - Sair'
 
     read -p 'Escolha uma opção: ' option
 
     case $option in
     01 | 1)
-        install_checkuser
+        initialize_process_install 'binary'
         console_menu
         ;;
     02 | 2)
-        uninstall_checkuser
+        initialize_process_install 'compile'
         console_menu
         ;;
     03 | 3)
-        reinstall_checkuser
+        uninstall_checkuser
         console_menu
         ;;
     00 | 0)
@@ -80,17 +115,14 @@ function console_menu() {
 
 function main() {
     case $1 in
-    install)
-        install_checkuser
+    install | -i)
+        initialize_process_install $2
         ;;
     uninstall)
         uninstall_checkuser
         ;;
-    reinstall)
-        reinstall_checkuser
-        ;;
     *)
-        echo 'Usage: ./install.sh [install|uninstall|reinstall]'
+        echo 'Usage: ./install.sh [install|uninstall] [binary|compile]'
         exit 1
         ;;
     esac
