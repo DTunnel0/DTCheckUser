@@ -68,7 +68,7 @@ function initialize_process_install() {
 function uninstall_checkuser() {
     echo 'Desinstalando CheckUser...'
     checkuser --stop
-    pip3 uninstall checkuser -y &>/dev/null
+    python3 -m pip uninstall checkuser -y &>/dev/null
     rm -rf $(which checkuser)
     echo 'CheckUser desinstalado com sucesso.'
     read
