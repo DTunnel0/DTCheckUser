@@ -1,4 +1,4 @@
-url='https://github.com/DTunnel0/DTCheckUser'
+url='https://github.com/DTunnel0/DTCheckUser.git'
 checkuser='https://github.com/DTunnel0/DTCheckUser/raw/master/executable/checkuser'
 depends=('git' 'python3' 'python3-pip' 'python3-setuptools' 'python3-dev')
 
