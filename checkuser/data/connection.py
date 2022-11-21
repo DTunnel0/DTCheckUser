@@ -89,7 +89,7 @@ class V2rayConnection(Connection):
         self.executor = executor
 
     def __find_v2ray_port(self) -> str:
-        cmd = 'netstat -tunlp | grep v2ray'
+        cmd = 'netstat -tlpn | grep v2ray'
         data = self.executor.execute(cmd).splitlines()[-1]
         return data.split()[3].split(':')[-1]
 
@@ -102,7 +102,6 @@ class V2rayConnection(Connection):
             'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
             % self.__port
         )
-        print(cmd)
         addresses = self.executor.execute(cmd).splitlines()
         data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
         for address in addresses:
