@@ -14,14 +14,16 @@ function install_dependencies() {
 }
 
 function compile_checkuser() {
-    if ! command -v checkuser &>/dev/null; then
-        echo "Compilando checkuser"
-        git clone $url
-        cd DTCheckUser
-        sudo python3 setup.py install
-        cd ..
+    if [[ -d DTCheckUser ]]; then
         rm -rf DTCheckUser
     fi
+
+    echo "Compilando checkuser"
+    git clone $url
+    cd DTCheckUser
+    sudo python3 setup.py install
+    cd ..
+    rm -rf DTCheckUser
 }
 
 function install_binary() {
