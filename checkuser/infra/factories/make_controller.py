@@ -52,6 +52,7 @@ def make_all_controller() -> AllConnectionsController:
             [
                 SSHConnection(CommandExecutorImpl()),
                 OpenVPNConnection(AUXOpenVPNConnection()),
+                V2rayConnection(CommandExecutorImpl()),
             ]
         )
     )
