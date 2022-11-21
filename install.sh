@@ -6,8 +6,10 @@ cd ~
 
 function install_dependencies() {
     for depend in ${depends[@]}; do
-        if ! command -v $depend &>/dev/null; then
-            echo "Instalando dependencia $depend"
+
+        if ! which $depend &>/dev/null; then
+            echo "Installing $depend..."
+            sudo apt install $depend -y
         fi
     done
 }
@@ -67,6 +69,7 @@ function initialize_process_install() {
 function uninstall_checkuser() {
     echo 'Desinstalando CheckUser...'
     checkuser --stop
+    pip3 uninstall checkuser -y &>/dev/null
     rm -rf $(which checkuser)
     echo 'CheckUser desinstalado com sucesso.'
     read
