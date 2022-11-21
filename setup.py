@@ -12,7 +12,7 @@ URL = 'https://github.com/DTunnel0/DTCheckUser'
 LICENSE = 'MIT'
 
 setup(
-    name='DTCheckUser',
+    name='CheckUser',
     version=VERSION,
     long_description=DESCRIPTION,
     long_description_content_type='text/markdown',
