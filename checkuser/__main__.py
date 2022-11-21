@@ -1,4 +1,5 @@
 import logging
+import os
 
 from . import args, app, ws, io, logger
 from .daemon import Daemon
@@ -24,7 +25,7 @@ args.add_argument('--daemon', '-d', action='store_true', help='Run as daemon')
 args.add_argument('--log', '-l', type=str, help='LogLevel', default='INFO')
 
 
-def main(debug: bool = True) -> None:
+def main(debug: bool = os.getenv('APP_DEBUG') == '1') -> None:
     data = args.parse_args()
 
     logging.basicConfig(
