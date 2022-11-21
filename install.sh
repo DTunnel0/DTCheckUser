@@ -6,7 +6,6 @@ cd ~
 
 function install_dependencies() {
     for depend in ${depends[@]}; do
-
         if ! which $depend &>/dev/null; then
             echo "Installing $depend..."
             sudo apt install $depend -y

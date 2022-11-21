@@ -1,5 +1,3 @@
-# all connections controller
-
 from checkuser.domain.use_case import AllConnectionsUseCase
 from ..controller import Controller, HttpRequest, HttpResponse
 
