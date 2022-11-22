@@ -98,32 +98,38 @@ class V2rayConnection(Connection):
         return self.__find_v2ray_port()
 
     def count(self, username: str) -> int:
-        cmd = (
-            'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
-            % self.__port
-        )
-        addresses = self.executor.execute(cmd).splitlines()
-        data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
-        for address in addresses:
-            pattern = r'%s.*email: %s' % (address, username)
-            if re.search(pattern, data):
-                return 1
-        return 0
+        try:
+            cmd = (
+                'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
+                % self.__port
+            )
+            addresses = self.executor.execute(cmd).splitlines()
+            data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
+            for address in addresses:
+                pattern = r'%s.*email: %s' % (address, username)
+                if re.search(pattern, data):
+                    return 1
+            return 0
+        except Exception:
+            return 0
 
     def all(self) -> int:
-        cmd = (
-            'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
-            % self.__port
-        )
-        addresses = self.executor.execute(cmd).splitlines()
-        data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
-        emails = []
-        for address in addresses:
-            pattern = r'%s.*email: (\S+)' % address
-            email = re.search(pattern, data)
-            if email and email.group(1) not in emails:
-                emails.append(email.group(1))
-        return len(emails)
+        try:
+            cmd = (
+                'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
+                % self.__port
+            )
+            addresses = self.executor.execute(cmd).splitlines()
+            data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
+            emails = []
+            for address in addresses:
+                pattern = r'%s.*email: (\S+)' % address
+                email = re.search(pattern, data)
+                if email and email.group(1) not in emails:
+                    emails.append(email.group(1))
+            return len(emails)
+        except Exception:
+            return 0
 
 
 class InMemoryConnection(ConnectionKill):
