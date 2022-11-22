@@ -86,7 +86,7 @@ function is_installed() {
 
 function get_version() {
     if is_installed; then
-        checkuser --version
+        echo $(checkuser --version | cut -d ' ' -f 2)
     else
         echo '-1'
     fi
