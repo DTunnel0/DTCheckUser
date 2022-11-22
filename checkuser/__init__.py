@@ -1,13 +1,9 @@
 import argparse
 import logging
 
-from .infra.http.flask import app
-from .infra.ws.websocket import ws
-from .infra.ws.socketio import io
-
 logger = logging.getLogger(__name__)
 
-__version__ = '1.1.2'
+__version__ = '1.1.3'
 __author__ = 'Glemison C. Dutra'
 __email__ = 'glemyson20@gmail.com'
 

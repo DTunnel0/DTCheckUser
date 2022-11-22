@@ -1,7 +1,10 @@
 import logging
 import os
 
-from . import args, app, ws, io, logger
+from . import args, logger
+from .infra.http.flask import app
+from .infra.ws.websocket import ws
+from .infra.ws.socketio import io
 from .daemon import Daemon
 
 try:
