@@ -6,10 +6,8 @@ cd ~
 
 function install_dependencies() {
     for depend in ${depends[@]}; do
-        if ! which $depend &>/dev/null; then
-            echo "Installing $depend..."
-            sudo apt install $depend -y
-        fi
+        echo 'Instalando ' $depend '...'
+        sudo apt install $depend -y &>/dev/null
     done
 }
 
@@ -18,9 +16,10 @@ function compile_checkuser() {
         rm -rf DTCheckUser
     fi
 
-    echo "Compilando checkuser"
+    echo 'Compilando checkuser...'
     git clone $url &>/dev/null
     cd DTCheckUser
+    pip3 install -r requirements.txt &>/dev/null
     sudo python3 setup.py install &>/dev/null
     cd ..
     rm -rf DTCheckUser
@@ -54,15 +53,15 @@ function initialize_process_install() {
         install_dependencies
         compile_checkuser
     else
-        echo "Modo de instalacao invalido"
+        echo 'Modo de instalacao invalido'
         exit 1
     fi
 
     if command -v checkuser &>/dev/null; then
-        echo "checkuser instalado com sucesso"
+        echo 'checkuser instalado com sucesso'
         start_checkuser
     else
-        echo "Falha ao instalar checkuser"
+        echo 'Falha ao instalar checkuser'
         exit 1
     fi
 }
