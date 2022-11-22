@@ -30,7 +30,7 @@ app.add_url_rule(
 )
 
 app.add_url_rule(
-    '/page',
+    '/',
     methods=['GET'],
     endpoint='page',
     view_func=lambda: render_template_string(page_content),
