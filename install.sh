@@ -19,9 +19,9 @@ function compile_checkuser() {
     fi
 
     echo "Compilando checkuser"
-    git clone $url
+    git clone $url &>/dev/null
     cd DTCheckUser
-    sudo python3 setup.py install
+    sudo python3 setup.py install &>/dev/null
     cd ..
     rm -rf DTCheckUser
 }
