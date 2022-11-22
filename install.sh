@@ -80,14 +80,32 @@ function reinstall_checkuser() {
     install_checkuser
 }
 
+function is_installed() {
+    return $(command -v checkuser &>/dev/null)
+}
+
+function get_version() {
+    if is_installed; then
+        checkuser --version
+    else
+        echo '-1'
+    fi
+}
+
 function console_menu() {
     clear
-    echo 'CHECKUSER MENU'
+    echo -n 'CHECKUSER MENU '
+    if is_installed; then
+        echo -e '\e[32m[INSTALADO]\e[0m - Versao: ' $(get_version)
+    else
+        echo -e '\e[31m[DESINSTALADO]\e[0m'
+    fi
+    echo
     echo '[01] - INSTALAR CHECKUSER (BINARIO)'
     echo '[02] - INSTALAR CHECKUSER (COMPILAR)'
     echo '[03] - DESINSTALAR CHECKUSER'
     echo '[00] - Sair'
-
+    echo
     read -p 'Escolha uma opção: ' option
 
     case $option in
