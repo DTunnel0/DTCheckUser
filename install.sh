@@ -76,9 +76,15 @@ function start_process_install() {
 
 function uninstall_checkuser() {
     echo '[*] Parando DTCheckUser...'
+
     systemctl stop checkuser &>/dev/null
+    systemctl disable checkuser &>/dev/null
+    rm -rf /etc/systemd/system/checkuser.service &>/dev/null
+    systemctl daemon-reload &>/dev/null
+
     echo '[*] Desinstalando DTCheckUser...'
     python3 -m pip uninstall checkuser -y &>/dev/null
+    
     rm -rf $(which checkuser)
     echo '[+] DTCheckUser desinstalado!'
     read
