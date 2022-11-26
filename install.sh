@@ -84,7 +84,7 @@ function uninstall_checkuser() {
 
     echo '[*] Desinstalando DTCheckUser...'
     python3 -m pip uninstall checkuser -y &>/dev/null
-    
+
     rm -rf $(which checkuser)
     echo '[+] DTCheckUser desinstalado!'
     read
@@ -111,7 +111,7 @@ function get_version() {
 function console_menu() {
     clear
 
-    echo -n 'CHECKUSER MENU '
+    echo -n 'CHECKUSER MENU v1'
     if is_installed; then
         echo -e '\e[32m[INSTALADO]\e[0m - Versao:' $(get_version)
     else
