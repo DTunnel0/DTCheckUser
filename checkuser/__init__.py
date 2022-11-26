@@ -13,7 +13,6 @@ __description__ = (
     'VERSION: ' + __version__
 )
 
-
 args = argparse.ArgumentParser(description=__description__)
 args.add_argument(
     '-v',

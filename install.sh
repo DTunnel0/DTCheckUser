@@ -4,10 +4,35 @@ depends=('git' 'python3' 'python3-pip' 'python3-setuptools' 'python3-dev')
 
 cd ~
 
+checkuser_service() {
+    local _port=$1
+    local _cmd=$2
+
+    cat <<EOF >/etc/systemd/system/checkuser.service
+[Unit]
+Description=CheckUser Service
+After=network.target nss-lookup.target
+
+[Service]
+User=nobody
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+ExecStart=${_cmd} --port ${_port} --start
+Restart=on-failure
+RestartPreventExitStatus=23
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
 function install_dependencies() {
     for depend in ${depends[@]}; do
-        echo 'Instalando ' $depend '...'
-        sudo apt install $depend -y &>/dev/null
+        if ! command -v $depend &>/dev/null; then
+            echo "Instalando $depend..."
+            sudo apt install $depend
+        fi
     done
 }
 
@@ -30,7 +55,8 @@ function install_checkuser() {
 function start_checkuser() {
     echo '[*] Iniciando DTCheckUser...'
     read -p 'Porta: ' -e -i 5000 port
-    checkuser --port $port --start --daemon
+    # checkuser --port $port --start --daemon
+    checkuser_service $port which checkuser
 
     addr=$(curl -s icanhazip.com)
 
@@ -47,7 +73,8 @@ function start_process_install() {
 
 function uninstall_checkuser() {
     echo '[*] Parando DTCheckUser...'
-    checkuser --stop &>/dev/null
+    # checkuser --stop &>/dev/null
+    systemctl stop checkuser &>/dev/null
     echo '[*] Desinstalando DTCheckUser...'
     python3 -m pip uninstall checkuser -y &>/dev/null
     rm -rf $(which checkuser)
