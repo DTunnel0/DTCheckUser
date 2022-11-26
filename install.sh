@@ -55,8 +55,11 @@ function install_checkuser() {
 function start_checkuser() {
     echo '[*] Iniciando DTCheckUser...'
     read -p 'Porta: ' -e -i 5000 port
-    # checkuser --port $port --start --daemon
-    checkuser_service $port which checkuser
+    checkuser_service $port $(command -v checkuser)
+
+    systemctl daemon-reload
+    systemctl enable checkuser.service
+    systemctl start checkuser.service
 
     addr=$(curl -s icanhazip.com)
 
@@ -73,7 +76,6 @@ function start_process_install() {
 
 function uninstall_checkuser() {
     echo '[*] Parando DTCheckUser...'
-    # checkuser --stop &>/dev/null
     systemctl stop checkuser &>/dev/null
     echo '[*] Desinstalando DTCheckUser...'
     python3 -m pip uninstall checkuser -y &>/dev/null
