@@ -17,6 +17,7 @@ args.add_argument('--host', type=str, help='Host to listen', default='0.0.0.0')
 args.add_argument('--port', '-p', type=int, help='Port', default=5000)
 args.add_argument('--start', action='store_true', help='Start the daemon')
 args.add_argument('--log', '-l', type=str, help='LogLevel', default='INFO')
+args.add_argument('--log-file', type=str, help='Log file', default='/var/log/checkuser.log')
 
 
 def main(debug: bool = os.getenv('APP_DEBUG') == '1') -> None:
@@ -25,6 +26,7 @@ def main(debug: bool = os.getenv('APP_DEBUG') == '1') -> None:
     logging.basicConfig(
         level=getattr(logging, data.log.upper()),
         format='%(asctime)s - %(message)s',
+        filename=data.log_file,
     )
 
     if data.start:
