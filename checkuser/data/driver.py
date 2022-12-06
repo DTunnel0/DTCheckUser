@@ -67,15 +67,16 @@ class DriverImpl(Driver):
         try:
             try:
                 logger.debug('Checking limit with DTunnelManager')
-                cmd = 'vps view -u {} | grep limit: | cut -d' ' -f2'.format(username)
+                cmd = 'vps view -u {} | grep limit: | cut -d\' \' -f2'.format(username)
                 return int(self.executor.execute(cmd))
             except Exception:
                 logger.debug('DTunnelManager not found')
 
             archive = '/root/usuarios.db'
-            data = open(archive).read()
-            search = re.search(r'{}\s+(\d+)'.format(username), data)
-            return int(search.group(1)) if search else 0
+            with open(archive) as f:
+                data = f.read()
+                search = re.search(r'{}\s+(\d+)'.format(username), data)
+                return int(search.group(1)) if search else 0
         except FileNotFoundError:
             return 0
 
