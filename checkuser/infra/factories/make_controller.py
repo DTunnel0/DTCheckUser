@@ -12,6 +12,7 @@ from checkuser.data.connection import (
     SSHConnection,
     OpenVPNConnection,
     V2rayConnection,
+    V2RayService,
 )
 
 
@@ -29,7 +30,7 @@ def make_controller() -> CheckUserController:
             [
                 SSHConnection(CommandExecutorImpl()),
                 OpenVPNConnection(AUXOpenVPNConnection()),
-                V2rayConnection(CommandExecutorImpl()),
+                V2rayConnection(V2RayService(CommandExecutorImpl())),
             ],
         )
     )
@@ -52,7 +53,7 @@ def make_all_controller() -> AllConnectionsController:
             [
                 SSHConnection(CommandExecutorImpl()),
                 OpenVPNConnection(AUXOpenVPNConnection()),
-                V2rayConnection(CommandExecutorImpl()),
+                V2rayConnection(V2RayService(CommandExecutorImpl())),
             ]
         )
     )

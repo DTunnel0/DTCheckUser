@@ -23,11 +23,17 @@ args.add_argument('--log-file', type=str, help='Log file', default='/var/log/che
 def main(debug: bool = os.getenv('APP_DEBUG') == '1') -> None:
     data = args.parse_args()
 
-    logging.basicConfig(
-        level=getattr(logging, data.log.upper()),
-        format='%(asctime)s - %(message)s',
-        filename=data.log_file,
-    )
+    try:
+        logging.basicConfig(
+            level=getattr(logging, data.log.upper()),
+            format='%(asctime)s - %(message)s',
+            filename=data.log_file,
+        )
+    except PermissionError:
+        logging.basicConfig(
+            level=getattr(logging, data.log.upper()),
+            format='%(asctime)s - %(message)s',
+        )
 
     if data.start:
         io.init_app(app)

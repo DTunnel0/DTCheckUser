@@ -82,7 +82,7 @@ class OpenVPNConnection(ConnectionKill):
             return 0
 
 
-class V2rayConnection(Connection):
+class V2RayService:
     __log_file = '/var/log/v2ray/access.log'
 
     def __init__(self, executor: CommandExecutor):
@@ -93,19 +93,23 @@ class V2rayConnection(Connection):
         data = self.executor.execute(cmd).splitlines()[-1]
         return data.split()[3].split(':')[-1]
 
-    @property
-    def __port(self) -> str:
-        return self.__find_v2ray_port()
-
-    def count(self, username: str) -> int:
+    def __find_addresses(self) -> list:
+        addresses = []
         try:
             cmd = (
                 'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
-                % self.__port
+                % self.__find_v2ray_port()
             )
-            addresses = self.executor.execute(cmd).splitlines()
+            addresses.extend(self.executor.execute(cmd).splitlines())
+        except Exception:
+            pass
+
+        return addresses
+
+    def count(self, username: str) -> int:
+        try:
             data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
-            for address in addresses:
+            for address in self.__find_addresses():
                 pattern = r'%s.*email: %s' % (address, username)
                 if re.search(pattern, data):
                     return 1
@@ -115,14 +119,9 @@ class V2rayConnection(Connection):
 
     def all(self) -> int:
         try:
-            cmd = (
-                'netstat -np 2>/dev/null | grep :%s | grep ESTABLISHED | awk \'{print $5}\' | sort | uniq'
-                % self.__port
-            )
-            addresses = self.executor.execute(cmd).splitlines()
             data = self.executor.execute('tail -n 1000 %s' % self.__log_file)
             emails = []
-            for address in addresses:
+            for address in self.__find_addresses():
                 pattern = r'%s.*email: (\S+)' % address
                 email = re.search(pattern, data)
                 if email and email.group(1) not in emails:
@@ -130,6 +129,17 @@ class V2rayConnection(Connection):
             return len(emails)
         except Exception:
             return 0
+
+
+class V2rayConnection(Connection):
+    def __init__(self, service: V2RayService):
+        self.service = service
+
+    def count(self, username: str) -> int:
+        return self.service.count(username)
+
+    def all(self) -> int:
+        return self.service.all()
 
 
 class InMemoryConnection(ConnectionKill):

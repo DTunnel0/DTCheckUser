@@ -1,8 +1,13 @@
+import json
+import logging
+
 from typing import Callable
 from flask import request, Response
-from json import dumps
+
 
 from checkuser.infra.controller import Controller, HttpRequest
+
+logger = logging.getLogger(__name__)
 
 
 class FlaskAdpater:
@@ -23,13 +28,14 @@ class FlaskAdpater:
                     )
                 )
                 return Response(
-                    response=dumps(response.body, indent=4),
+                    response=json.dumps(response.body, indent=4),
                     status=response.status_code,
                     mimetype='application/json',
                 )
             except Exception as e:
+                logger.exception(e)
                 return Response(
-                    response=dumps({'error': str(e)}),
+                    response=json.dumps({'error': str(e)}),
                     status=500,
                     mimetype='application/json',
                 )
@@ -47,6 +53,6 @@ class WebSocketAdapter:
                     body=data,
                 )
             )
-            return dumps(response.body, indent=4)
+            return json.dumps(response.body, indent=4)
         except Exception as e:
-            return dumps({'error': str(e)})
+            return json.dumps({'error': str(e)})

@@ -62,6 +62,12 @@ class DriverImpl(Driver):
 
     def get_connection_limit(self, username: str) -> int:
         try:
+            try:
+                cmd = 'vps view -u {} | grep limit: | cut -d' ' -f2'.format(username)
+                return int(self.executor.execute(cmd))
+            except Exception:
+                pass
+
             archive = '/root/usuarios.db'
             data = open(archive).read()
             search = re.search(r'{}\s+(\d+)'.format(username), data)
