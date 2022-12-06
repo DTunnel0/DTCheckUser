@@ -84,6 +84,7 @@ function uninstall_checkuser() {
 
     echo '[*] Desinstalando DTCheckUser...'
     python3 -m pip uninstall checkuser -y &>/dev/null
+    python3 -m pip uninstall checkeruser -y &>/dev/null
 
     rm -rf $(which checkuser)
     echo '[+] DTCheckUser desinstalado!'
