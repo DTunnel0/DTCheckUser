@@ -1,10 +1,13 @@
 import datetime
+import re
+import logging
 
 from abc import ABCMeta, abstractmethod
-import re
 from typing import Union, List
 
 from checkuser.data.executor import CommandExecutor
+
+logger = logging.getLogger(__name__)
 
 
 class Driver(metaclass=ABCMeta):
@@ -63,10 +66,11 @@ class DriverImpl(Driver):
     def get_connection_limit(self, username: str) -> int:
         try:
             try:
+                logger.debug('Checking limit with DTunnelManager')
                 cmd = 'vps view -u {} | grep limit: | cut -d' ' -f2'.format(username)
                 return int(self.executor.execute(cmd))
             except Exception:
-                pass
+                logger.debug('DTunnelManager not found')
 
             archive = '/root/usuarios.db'
             data = open(archive).read()
