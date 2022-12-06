@@ -10,4 +10,9 @@ class CommandExecutor(metaclass=ABCMeta):
 
 class CommandExecutorImpl(CommandExecutor):
     def execute(self, command: str) -> str:
-        return subprocess.check_output(command, shell=True).decode('utf-8')
+        data = subprocess.check_output(
+            command,
+            shell=True,
+            timeout=1,
+        )
+        return data.decode('utf-8')

@@ -73,6 +73,7 @@ class DriverImpl(Driver):
                 logger.debug('DTunnelManager not found')
 
             archive = '/root/usuarios.db'
+            logger.debug('Checking limit with {}'.format(archive))
             with open(archive) as f:
                 data = f.read()
                 search = re.search(r'{}\s+(\d+)'.format(username), data)
