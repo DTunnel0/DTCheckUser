@@ -11,10 +11,15 @@ class OutputDTO(NamedTuple):
     expiration_date: Union[None, datetime.datetime]
     limit_connections: int
     count_connections: int
+    count_devices: int
 
 
 class CheckUserUseCase:
-    def __init__(self, repository: UserRepository, connections: List[Connection]) -> None:
+    def __init__(
+        self,
+        repository: UserRepository,
+        connections: List[Connection],
+    ) -> None:
         self.repository = repository
         self.connections = connections
 
@@ -27,6 +32,7 @@ class CheckUserUseCase:
             expiration_date=user.expiration_date,
             limit_connections=user.connection_limit,
             count_connections=count,
+            count_devices=len(user.devices),
         )
 
 
