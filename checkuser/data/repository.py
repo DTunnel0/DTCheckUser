@@ -49,7 +49,7 @@ class DeviceRepositorySQL(DeviceRepository):
     def __init__(self, conn: sqlite3.Connection):
         self.sqlite = conn
 
-    def get_by_id(self, id: str) -> Device | None:
+    def get_by_id(self, id: str) -> Union[Device, None]:
         cmd = 'SELECT * FROM devices WHERE id = ?'
         data = self.sqlite.execute(cmd, (id,)).fetchall()
         return Device(data[0][0], data[0][1]) if data else None
