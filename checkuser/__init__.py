@@ -3,7 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-__version__ = '1.4.0'
+__version__ = '1.4.1'
 __author__ = 'Glemison C. Dutra'
 __email__ = 'glemyson20@gmail.com'
 

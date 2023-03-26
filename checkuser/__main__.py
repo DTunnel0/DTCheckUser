@@ -34,6 +34,7 @@ def main(debug: bool = os.getenv('APP_DEBUG') == '1') -> None:
             level=getattr(logging, data.log.upper()),
             format='%(asctime)s - %(message)s',
         )
+        logging.warn('Could not create log file')
 
     if data.start:
         io.init_app(app)
