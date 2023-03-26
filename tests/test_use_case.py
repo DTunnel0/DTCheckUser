@@ -1,22 +1,33 @@
-from unittest.mock import Mock
-
-from checkuser.domain.user import User
+from checkuser.data.connection import ConnectionMemory
+from checkuser.data.repository import DeviceRepositoryMemory, UserRepositoryMemory
 from checkuser.domain.use_case import CheckUserUseCase
 
 
 def test_should_check_user():
-    repository = Mock()
-    repository.get_by_username.return_value = User(
-        id=1000,
-        username='test',
-        expiration_date=None,
-        connection_limit=10,
-    )
+    user_repository = UserRepositoryMemory()
+    device_repository = DeviceRepositoryMemory()
+    connection = ConnectionMemory()
 
-    connection_count = Mock()
-    connection_count.count.return_value = 5
+    use_case = CheckUserUseCase(user_repository, device_repository, connection)
+    data = use_case.execute('test1', 'abc123')
 
-    use_case = CheckUserUseCase(repository, [connection_count])
-    output_dto = use_case.execute('test')
+    assert data.id == 1000
+    assert data.username == 'test1'
 
-    assert output_dto.id == 1000
+
+def test_should_test_device_limit() -> None:
+    user_repository = UserRepositoryMemory()
+    device_repository = DeviceRepositoryMemory()
+    connection = ConnectionMemory()
+
+    use_case = CheckUserUseCase(user_repository, device_repository, connection)
+    data = use_case.execute('test3', 'abc123')
+
+    assert data.username == 'test3'
+    assert data.count_connections == 1
+
+    data = use_case.execute('test3', 'abc124')
+    assert data.count_connections == 2
+
+    data = use_case.execute('test3', 'abc123')
+    assert data.count_connections == 1

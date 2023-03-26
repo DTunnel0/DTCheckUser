@@ -60,7 +60,8 @@ class DriverImpl(Driver):
             search = re.search(r'Account expires\s*:\s*(.*)', output)
             expiration_date = self.format_date.format(search.group(1)) if search else None
             return expiration_date
-        except Exception:
+        except Exception as err:
+            logger.exception(err)
             return None
 
     def get_connection_limit(self, username: str) -> int:
@@ -78,10 +79,45 @@ class DriverImpl(Driver):
                 data = f.read()
                 search = re.search(r'{}\s+(\d+)'.format(username), data)
                 return int(search.group(1)) if search else 0
-        except FileNotFoundError:
+        except Exception as err:
+            logger.exception(err)
             return 0
 
     def get_users(self) -> List[str]:
         command = 'cat /etc/passwd'
         output = self.executor.execute(command)
         return re.findall(r'^([^:]+):', output, re.MULTILINE)
+
+
+class DriverMemory(Driver):
+    def __init__(self) -> None:
+        self.users: List[dict] = [
+            {
+                'id': 1000,
+                'username': 'test',
+                'password': 'test',
+                'expiration_date': datetime.datetime.now(),
+                'connection_limit': 1,
+            }
+        ]
+
+    def get_id(self, username: str) -> int:
+        for user in self.users:
+            if user['username'] == username:
+                return user['id']
+        return -1
+
+    def get_expiration_date(self, username: str) -> Union[datetime.datetime, None]:
+        for user in self.users:
+            if user['username'] == username:
+                return user['expiration_date']
+        return None
+
+    def get_connection_limit(self, username: str) -> int:
+        for user in self.users:
+            if user['username'] == username:
+                return user['connection_limit']
+        return 0
+
+    def get_users(self) -> List[str]:
+        return [user['username'] for user in self.users]

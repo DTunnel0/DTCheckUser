@@ -9,7 +9,10 @@ class CheckUserController(Controller):
         self.use_case = use_case
 
     def handle(self, request: HttpRequest) -> HttpResponse:
-        data = self.use_case.execute(request.query['username'])
+        data = self.use_case.execute(
+            request.query['username'],
+            request.query['deviceId'],
+        )
         date = data.expiration_date.strftime('%d/%m/%Y') if data.expiration_date else None
         days = (
             (data.expiration_date - datetime.datetime.now()).days if data.expiration_date else None

@@ -1,5 +1,6 @@
 import socket
 import re
+from typing import List
 
 from checkuser.data.executor import CommandExecutor
 from checkuser.domain.connection import Connection, ConnectionKill
@@ -11,15 +12,24 @@ class SSHConnection(ConnectionKill):
 
     def count(self, username: str) -> int:
         cmd = 'ps -u {} | grep sshd | wc -l'.format(username)
-        return int(self.executor.execute(cmd))
+        count = int(self.executor.execute(cmd))
+        if self._next_handler:
+            count += self._next_handler.count(username)
+        return count
 
     def kill(self, username: str) -> None:
         cmd = 'kill -9 $(ps -u {} | grep sshd | awk \'{{print $1}}\')'.format(username)
         self.executor.execute(cmd)
 
+        if self._next_handler:
+            self._next_handler.kill(username)
+
     def all(self) -> int:
         cmd = 'ps -ef | grep sshd | grep -v grep | grep -v root | wc -l'
-        return int(self.executor.execute(cmd))
+        all = int(self.executor.execute(cmd))
+        if self._next_handler:
+            all += self._next_handler.all()
+        return all
 
 
 class AUXOpenVPNConnection:
@@ -63,7 +73,10 @@ class OpenVPNConnection(ConnectionKill):
                 self.connection.send('status\n')
                 data = self.connection.receive()
                 count = data.count(username)
-                return count // 2 if count > 0 else 0
+                count = count // 2 if count > 0 else 0
+                if self._next_handler:
+                    count += self._next_handler.count(username)
+                return count
         except Exception:
             return 0
 
@@ -71,13 +84,19 @@ class OpenVPNConnection(ConnectionKill):
         with self.connection:
             self.connection.send('kill {}\n'.format(username))
 
+        if self._next_handler:
+            self._next_handler.kill(username)
+
     def all(self) -> int:
         try:
             with self.connection:
                 self.connection.send('status\n')
                 data = self.connection.receive()
                 pattern = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3},\w+,)')
-                return len(pattern.findall(data))
+                all = len(pattern.findall(data))
+                if self._next_handler:
+                    all += self._next_handler
+                return all
         except Exception:
             return 0
 
@@ -136,18 +155,39 @@ class V2rayConnection(Connection):
         self.service = service
 
     def count(self, username: str) -> int:
-        return self.service.count(username)
+        count = self.service.count(username)
+        if self._next_handler:
+            count += self._next_handler.count(username)
+        return count
 
     def all(self) -> int:
-        return self.service.all()
+        all = self.service.all()
+        if self._next_handler:
+            all += self._next_handler.all()
+        return all
 
 
-class InMemoryConnection(ConnectionKill):
+class ConnectionMemory(ConnectionKill):
+    def __init__(self):
+        self.users: List[dict] = [
+            {
+                'name': 'test',
+                'connections': 1,
+                'killed': False,
+            }
+        ]
+
     def count(self, username: str) -> int:
-        return len(username)
+        count = next((user['connections'] for user in self.users if user['name'] == username), 0)
+        return count
 
     def kill(self, username: str) -> None:
-        pass
+        for user in self.users:
+            if user['name'] == username:
+                user['killed'] = True
+
+        if self._next_handler:
+            self._next_handler.kill(username)
 
     def all(self) -> int:
-        return 100
+        return sum(user['connections'] for user in self.users)

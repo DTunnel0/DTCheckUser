@@ -1,8 +1,9 @@
 import datetime
 
-from typing import Union, NamedTuple, List
+from typing import Union, NamedTuple
 from checkuser.domain.connection import Connection, ConnectionKill
-from checkuser.domain.repository import UserRepository
+from checkuser.domain.repository import UserRepository, DeviceRepository
+from checkuser.domain.user import Device
 
 
 class OutputDTO(NamedTuple):
@@ -11,43 +12,51 @@ class OutputDTO(NamedTuple):
     expiration_date: Union[None, datetime.datetime]
     limit_connections: int
     count_connections: int
-    count_devices: int
 
 
 class CheckUserUseCase:
     def __init__(
         self,
-        repository: UserRepository,
-        connections: List[Connection],
+        user_repository: UserRepository,
+        device_repository: DeviceRepository,
+        connection: Connection,
     ) -> None:
-        self.repository = repository
-        self.connections = connections
+        self.user_repository = user_repository
+        self.device_repository = device_repository
+        self.connection = connection
 
-    def execute(self, username: str) -> OutputDTO:
-        user = self.repository.get_by_username(username)
-        count = sum([connection.count(username) for connection in self.connections])
+    def execute(self, username: str, device_id: str) -> OutputDTO:
+        user = self.user_repository.get(username)
+        devices = self.device_repository.count(username)
+
+        device_exists = self.device_repository.get_by_id(device_id) is not None
+        limit_reached = not device_exists and user.limit_reached(devices)
+
+        if not device_exists and not limit_reached:
+            self.device_repository.save(Device(device_id, username))
+            devices += 1
+
+        connections = devices if not limit_reached else user.connection_limit + 1
         return OutputDTO(
             id=user.id,
             username=user.username,
             expiration_date=user.expiration_date,
             limit_connections=user.connection_limit,
-            count_connections=count,
-            count_devices=len(user.devices),
+            count_connections=connections,
         )
 
 
 class KillConnectionUseCase:
-    def __init__(self, connections: List[ConnectionKill]) -> None:
-        self.connections = connections
+    def __init__(self, connection: ConnectionKill) -> None:
+        self.connection = connection
 
     def execute(self, username: str) -> None:
-        for connection in self.connections:
-            connection.kill(username)
+        self.connection.kill(username)
 
 
 class AllConnectionsUseCase:
-    def __init__(self, connections: List[Connection]) -> None:
-        self.connections = connections
+    def __init__(self, connection: Connection) -> None:
+        self.connection = connection
 
     def execute(self) -> int:
-        return sum([connection.all() for connection in self.connections])
+        return self.connection.all()

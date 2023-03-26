@@ -1,3 +1,5 @@
+from typing import Callable
+from checkuser.data.database.sqlite import create_connection
 from checkuser.infra.controller import Controller
 from checkuser.infra.controllers.check_user import CheckUserController
 from checkuser.infra.controllers.kill_connection import KillConnectionController
@@ -5,7 +7,10 @@ from checkuser.infra.controllers.all_connections import AllConnectionsController
 
 from checkuser.data.executor import CommandExecutorImpl
 from checkuser.data.driver import DriverImpl, FormatDateUS
-from checkuser.data.repository import UserRepositoryImpl, InMemoryUserRepository
+from checkuser.data.repository import (
+    DeviceRepositorySQL,
+    UserRepositoryImpl,
+)
 from checkuser.domain.use_case import CheckUserUseCase, KillConnectionUseCase, AllConnectionsUseCase
 from checkuser.data.connection import (
     AUXOpenVPNConnection,
@@ -17,55 +22,58 @@ from checkuser.data.connection import (
 
 
 def make_controller() -> CheckUserController:
-    repository = UserRepositoryImpl(
+    user_repository = UserRepositoryImpl(
         DriverImpl(
             CommandExecutorImpl(),
             FormatDateUS(),
         ),
     )
 
+    device_repository = DeviceRepositorySQL(create_connection())
+
+    cmd = CommandExecutorImpl()
+    aux = AUXOpenVPNConnection()
+    v2_service = V2RayService(cmd)
+
+    connection = (
+        SSHConnection(cmd)
+        .set_next_handler(OpenVPNConnection(aux))
+        .set_next_handler(V2rayConnection(v2_service))
+    )
+
     return CheckUserController(
         CheckUserUseCase(
-            repository,
-            [
-                SSHConnection(CommandExecutorImpl()),
-                OpenVPNConnection(AUXOpenVPNConnection()),
-                V2rayConnection(V2RayService(CommandExecutorImpl())),
-            ],
+            user_repository=user_repository,
+            device_repository=device_repository,
+            connection=connection,
         )
     )
 
 
 def make_kill_controller() -> KillConnectionController:
-    return KillConnectionController(
-        KillConnectionUseCase(
-            [
-                SSHConnection(CommandExecutorImpl()),
-                OpenVPNConnection(AUXOpenVPNConnection()),
-            ]
-        )
-    )
+    cmd = CommandExecutorImpl()
+    aux = AUXOpenVPNConnection()
+    ssh = SSHConnection(cmd)
+    ssh.set_next_handler(OpenVPNConnection(aux))
+    return KillConnectionController(KillConnectionUseCase(ssh))
 
 
 def make_all_controller() -> AllConnectionsController:
-    return AllConnectionsController(
-        AllConnectionsUseCase(
-            [
-                SSHConnection(CommandExecutorImpl()),
-                OpenVPNConnection(AUXOpenVPNConnection()),
-                V2rayConnection(V2RayService(CommandExecutorImpl())),
-            ]
-        )
-    )
+    cmd = CommandExecutorImpl()
+    aux = AUXOpenVPNConnection()
+    v2 = V2RayService(CommandExecutorImpl())
+
+    ssh = SSHConnection(cmd)
+    ssh.set_next_handler(OpenVPNConnection(aux)).set_next_handler(V2rayConnection(v2))
+    return AllConnectionsController(AllConnectionsUseCase(ssh))
 
 
-class Controllers:
-    _controllers = {
-        'check': make_controller(),
-        'kill': make_kill_controller(),
-        'all': make_all_controller(),
-    }
-
+class ControllerFactory:
     @staticmethod
-    def get(controller: str) -> Controller:
-        return Controllers._controllers[controller]
+    def get(controller: str) -> Callable[..., Controller]:
+        __controllers = {
+            'check': make_controller,
+            'kill': make_kill_controller,
+            'all': make_all_controller,
+        }
+        return __controllers[controller]

@@ -2,7 +2,7 @@ import logging
 
 from flask import request
 from flask_socketio import SocketIO, emit
-from checkuser.infra.factories.make_controller import Controllers
+from checkuser.infra.factories.make_controller import ControllerFactory
 from checkuser.infra.adapter import WebSocketAdapter
 
 io = SocketIO(cors_allowed_origins='*')
@@ -22,5 +22,5 @@ def on_message(data: dict) -> None:
     logger.info('[ACTION] -> %s', data['action'])
     logger.info('-' * 50)
 
-    response = WebSocketAdapter.adapt(Controllers.get(data['action']), data['data'])
+    response = WebSocketAdapter.adapt(ControllerFactory.get(data['action']), data['data'])
     emit('message', response)

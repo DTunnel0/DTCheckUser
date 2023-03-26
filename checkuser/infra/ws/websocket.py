@@ -3,7 +3,7 @@ import logging
 from json import loads
 from flask_sock import Sock, Server
 
-from checkuser.infra.factories.make_controller import Controllers
+from checkuser.infra.factories.make_controller import ControllerFactory
 from checkuser.infra.adapter import WebSocketAdapter
 
 ws = Sock()
@@ -25,5 +25,5 @@ def handle_message(server: Server):
         logger.info('[ACTION] -> %s', data['action'])
         logger.info('-' * 50)
 
-        response = WebSocketAdapter.adapt(Controllers.get(data['action']), data['data'])
+        response = WebSocketAdapter.adapt(ControllerFactory.get(data['action']), data['data'])
         server.send(response)

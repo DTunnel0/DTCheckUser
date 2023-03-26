@@ -1,5 +1,7 @@
 from unittest.mock import Mock
 from datetime import datetime, timedelta
+from checkuser.data.connection import ConnectionMemory
+from checkuser.data.repository import DeviceRepositoryMemory, UserRepositoryMemory
 
 
 from checkuser.domain.user import User
@@ -10,22 +12,18 @@ from checkuser.infra.controllers.kill_connection import KillConnectionController
 
 
 def test_should_check_user():
-    repository = Mock()
-    repository.get_by_username.return_value = User(
-        id=1000,
-        username='test',
-        expiration_date=datetime.now() + timedelta(days=10),
-        connection_limit=10,
-    )
+    user_repository = UserRepositoryMemory()
+    device_repository = DeviceRepositoryMemory()
+    connection = ConnectionMemory()
 
-    connection = Mock()
-    connection.count.return_value = 5
-
-    use_case = CheckUserUseCase(repository, [connection])
+    use_case = CheckUserUseCase(user_repository, device_repository, connection)
     controller = CheckUserController(use_case)
     response = controller.handle(
         HttpRequest(
-            query={'username': 'test'},
+            query={
+                'username': 'test1',
+                'deviceId': 'test',
+            },
             body={},
         )
     )
@@ -35,11 +33,14 @@ def test_should_check_user():
 
 
 def test_should_kill_connection():
-    connection = Mock()
-    connection.kill.return_value = None
+    connection1 = ConnectionMemory()
+    connection2 = ConnectionMemory()
+    connection2.set_next_handler(connection1)
 
-    use_case = KillConnectionUseCase([connection])
+    use_case = KillConnectionUseCase(connection2)
     controller = KillConnectionController(use_case)
 
     controller.handle(HttpRequest(query={'username': 'test'}, body={}))
-    connection.kill.assert_called_once_with('test')
+
+    assert connection1.users[0]['killed']
+    assert connection2.users[0]['killed']
