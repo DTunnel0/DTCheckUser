@@ -190,4 +190,7 @@ class ConnectionMemory(ConnectionKill):
             self._next_handler.kill(username)
 
     def all(self) -> int:
-        return sum(user['connections'] for user in self.users)
+        all = sum(user['connections'] for user in self.users)
+        if self._next_handler:
+            all += self._next_handler.all()
+        return all

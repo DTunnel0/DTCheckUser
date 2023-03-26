@@ -49,12 +49,7 @@ class WebSocketAdapter:
     def adapt(factory: Callable[..., Controller], data: dict) -> str:
         try:
             controller = factory()
-            response = controller.handle(
-                HttpRequest(
-                    query=data,
-                    body=data,
-                )
-            )
+            response = controller.handle(HttpRequest(query=data, body=data))
             return json.dumps(response.body, indent=4)
         except Exception as e:
             return json.dumps({'error': str(e)})

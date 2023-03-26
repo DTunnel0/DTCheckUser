@@ -1,4 +1,5 @@
 from typing import Callable
+
 from checkuser.data.database.sqlite import create_connection
 from checkuser.infra.controller import Controller
 from checkuser.infra.controllers.check_user import CheckUserController

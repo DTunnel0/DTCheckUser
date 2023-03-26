@@ -1,5 +1,10 @@
 from unittest.mock import Mock
-from checkuser.data.connection import SSHConnection, OpenVPNConnection, V2rayConnection
+from checkuser.data.connection import (
+    ConnectionMemory,
+    SSHConnection,
+    OpenVPNConnection,
+    V2rayConnection,
+)
 
 
 def test_should_count_ssh_connections():
@@ -27,3 +32,12 @@ def test_should_count_v2ray_connections():
 
     assert connection.count('test') == 1
     assert connection.all() == 1
+
+
+def test_should_count_all_connections():
+    connection = ConnectionMemory()
+    connection.set_next_handler(ConnectionMemory()).set_next_handler(
+        ConnectionMemory()
+    ).set_next_handler(ConnectionMemory()).set_next_handler(ConnectionMemory())
+
+    assert connection.all() == 5
