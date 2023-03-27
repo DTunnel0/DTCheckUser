@@ -3,12 +3,12 @@ import logging
 
 try:
     __import__('dotenv').load_dotenv()
-except Exception as err:
-    logging.warning('Warning loading dotenv: %s', err)
+except Exception:
+    pass
 
 logger = logging.getLogger(__name__)
 
-__version__ = '1.4.3'
+__version__ = '1.4.4'
 __author__ = 'Glemison C. Dutra'
 __email__ = 'glemyson20@gmail.com'
 
