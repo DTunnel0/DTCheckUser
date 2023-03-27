@@ -21,7 +21,7 @@ class OutputDTO(NamedTuple):
     def days(self) -> Union[None, int]:
         if self.expiration_date is None:
             return None
-        return (datetime.datetime.now() - self.expiration_date).days + 1
+        return (self.expiration_date - datetime.datetime.now()).days + 1
 
 
 class CheckUserUseCase:
