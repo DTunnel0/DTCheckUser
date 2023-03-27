@@ -1,7 +1,10 @@
 import argparse
 import logging
 
-__import__('dotenv').load_dotenv()
+try:
+    __import__('dotenv').load_dotenv()
+except Exception as err:
+    logging.warning('Warning loading dotenv: %s', err)
 
 logger = logging.getLogger(__name__)
 
