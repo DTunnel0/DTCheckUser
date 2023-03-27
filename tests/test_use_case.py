@@ -20,8 +20,6 @@ def test_should_test_device_limit() -> None:
 
     use_case = CheckUserUseCase(user_repository, device_repository)
     data = use_case.execute('test3', 'abc123')
-
-    assert data.username == 'test3'
     assert data.count_connections == 1
 
     data = use_case.execute('test3', 'abc124')

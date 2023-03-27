@@ -5,11 +5,13 @@ from checkuser.data.database.sqlite import delete_database
 
 from checkuser.infra.factories.make_device_use_case import (
     make_delete_devices_use_case,
+    make_list_all_devices_use_case,
     make_list_devices_use_case,
 )
 
-from checkuser.infra.presenter.delete_devices_presenter import DeleteDevicesPresenter
-from checkuser.infra.presenter.list_devices_presenter import ListDevicesPresenter
+from checkuser.infra.presenter.delete_devices import DeleteDevicesPresenter
+from checkuser.infra.presenter.list_all_devices import ListAllDevicesPresenter
+from checkuser.infra.presenter.list_devices import ListDevicesPresenter
 
 from . import args
 from .infra.http.flask import app
@@ -29,6 +31,7 @@ args.add_argument('--start', action='store_true', help='Start the daemon')
 args.add_argument('--log', '-l', type=str, help='LogLevel', default='INFO')
 args.add_argument('--log-file', type=str, help='Log file', default='/var/log/checkuser.log')
 
+args.add_argument('--list-all-devices', action='store_true', help='List all devices')
 args.add_argument('--list-devices', type=str, help='List devices from a user')
 args.add_argument('--delete-devices', type=str, help='Delete devices from a user')
 args.add_argument('--delete-db', action='store_true', help='Delete database of devices')
@@ -36,6 +39,11 @@ args.add_argument('--delete-db', action='store_true', help='Delete database of d
 
 def main(debug: bool = os.getenv('APP_DEBUG') == '1') -> None:
     data = args.parse_args()
+
+    if data.list_all_devices:
+        presenter = ListAllDevicesPresenter(make_list_all_devices_use_case())
+        presenter.present()
+        return
 
     if data.list_devices:
         presenter = ListDevicesPresenter(make_list_devices_use_case())

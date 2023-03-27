@@ -13,10 +13,7 @@ from checkuser.infra.controllers.all_connections import AllConnectionsController
 
 from checkuser.data.executor import CommandExecutorImpl
 from checkuser.data.driver import DriverImpl, FormatDateUS
-from checkuser.data.repository import (
-    DeviceRepositorySQL,
-    UserRepositoryImpl,
-)
+from checkuser.data.repository import DeviceRepositorySQL, UserRepositoryImpl
 from checkuser.data.connection import (
     AUXOpenVPNConnection,
     SSHConnection,

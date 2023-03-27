@@ -49,9 +49,9 @@ class DeviceRepositorySQL(DeviceRepository):
     def __init__(self, conn: sqlite3.Connection):
         self.sqlite = conn
 
-    def exists(self, id: str) -> bool:
-        cmd = 'SELECT * FROM devices WHERE device_id = ?'
-        data = self.sqlite.execute(cmd, (id,)).fetchall()
+    def exists(self, username: str, id: str) -> bool:
+        cmd = 'SELECT * FROM devices WHERE username = ? AND device_id = ?'
+        data = self.sqlite.execute(cmd, (username, id)).fetchall()
         return bool(data)
 
     def save(self, device: Device) -> None:
@@ -62,7 +62,7 @@ class DeviceRepositorySQL(DeviceRepository):
     def list_devices(self, username: str) -> List[Device]:
         cmd = 'SELECT * FROM devices WHERE username = ?'
         data = self.sqlite.execute(cmd, (username,)).fetchall()
-        return [Device(device[0], device[1]) for device in data]
+        return [Device(device[1], device[2]) for device in data]
 
     def count(self, username: str) -> int:
         cmd = 'SELECT COUNT(*) FROM devices WHERE username = ?'
@@ -73,6 +73,11 @@ class DeviceRepositorySQL(DeviceRepository):
         self.sqlite.execute(cmd, (username,))
         self.sqlite.commit()
 
+    def list_all(self) -> List[Device]:
+        cmd = 'SELECT * FROM devices'
+        data = self.sqlite.execute(cmd).fetchall()
+        return [Device(device[1], device[2]) for device in data]
+
 
 class DeviceRepositoryMemory(DeviceRepository):
     def __init__(self):
@@ -81,8 +86,8 @@ class DeviceRepositoryMemory(DeviceRepository):
     def save(self, device: Device) -> None:
         self.devices.append(device)
 
-    def exists(self, id: str) -> Union[Device, None]:
-        return any(device for device in self.devices if device.id == id)
+    def exists(self, username: str, id: str) -> Union[Device, None]:
+        return any(device.id == id and device.username == username for device in self.devices)
 
     def list_devices(self, username: str) -> List[Device]:
         return [device for device in self.devices if device.username == username]
@@ -92,3 +97,6 @@ class DeviceRepositoryMemory(DeviceRepository):
 
     def delete_by_username(self, username: str) -> None:
         self.devices = [device for device in self.devices if device.username != username]
+
+    def list_all(self) -> List[Device]:
+        return self.devices

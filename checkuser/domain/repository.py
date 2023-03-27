@@ -16,7 +16,11 @@ class UserRepository(metaclass=ABCMeta):
 
 class DeviceRepository(metaclass=ABCMeta):
     @abstractmethod
-    def exists(self, id: str) -> bool:
+    def save(self, device: Device) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def exists(self, username: str, id: str) -> bool:
         raise NotImplementedError
 
     @abstractmethod
@@ -24,7 +28,7 @@ class DeviceRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def save(self, device: Device) -> None:
+    def delete_by_username(self, username: str) -> None:
         raise NotImplementedError
 
     @abstractmethod
@@ -32,5 +36,5 @@ class DeviceRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def delete_by_username(self, username: str) -> None:
+    def list_all(self) -> List[Device]:
         raise NotImplementedError

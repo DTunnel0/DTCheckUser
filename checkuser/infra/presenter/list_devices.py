@@ -13,6 +13,8 @@ class ListDevicesPresenter:
             return
 
         print('-' * 50)
+        print('{0:<33} {1}'.format('ID', 'NOME DE USUARIO'))
+        print('-' * 50)
         for device in data:
-            print('%s - %s ' % (device.id, device.username))
+            print('%-33s %s ' % (device.id, device.username))
             print('-' * 50)
