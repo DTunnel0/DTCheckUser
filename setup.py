@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from checkuser import __version__, __author__, __email__
 
 PACKAGES = [*find_packages(), 'pages']
-REQUIREMENTS = ['flask', 'flask-sock', 'flask-socketio', 'eventlet']
+REQUIREMENTS = ['flask', 'flask-sock', 'flask-socketio', 'eventlet', 'python-dotenv']
 VERSION = __version__
 
 DESCRIPTION = open('README.md').read()
