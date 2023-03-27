@@ -36,21 +36,10 @@ def make_controller() -> CheckUserController:
 
     device_repository = DeviceRepositorySQL(create_connection())
 
-    cmd = CommandExecutorImpl()
-    aux = AUXOpenVPNConnection()
-    v2_service = V2RayService(cmd)
-
-    connection = (
-        SSHConnection(cmd)
-        .set_next_handler(OpenVPNConnection(aux))
-        .set_next_handler(V2rayConnection(v2_service))
-    )
-
     return CheckUserController(
         CheckUserUseCase(
             user_repository=user_repository,
             device_repository=device_repository,
-            connection=connection,
         )
     )
 
