@@ -1,9 +1,11 @@
 import argparse
 import logging
 
+__import__('dotenv').load_dotenv()
+
 logger = logging.getLogger(__name__)
 
-__version__ = '1.4.2'
+__version__ = '1.4.3'
 __author__ = 'Glemison C. Dutra'
 __email__ = 'glemyson20@gmail.com'
 
