@@ -28,5 +28,9 @@ class DeviceRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def get_by_username(self, username: str) -> List[Device]:
+    def list_devices(self, username: str) -> List[Device]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete_by_username(self, username: str) -> None:
         raise NotImplementedError

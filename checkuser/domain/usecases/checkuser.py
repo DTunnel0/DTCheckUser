@@ -1,7 +1,7 @@
 import datetime
 
 from typing import Union, NamedTuple
-from checkuser.domain.connection import Connection, ConnectionKill
+from checkuser.domain.connection import Connection
 from checkuser.domain.repository import UserRepository, DeviceRepository
 from checkuser.domain.user import Device
 
@@ -19,11 +19,9 @@ class CheckUserUseCase:
         self,
         user_repository: UserRepository,
         device_repository: DeviceRepository,
-        connection: Connection,
     ) -> None:
         self.user_repository = user_repository
         self.device_repository = device_repository
-        self.connection = connection
 
     def execute(self, username: str, device_id: str) -> OutputDTO:
         user = self.user_repository.get(username)
@@ -44,19 +42,3 @@ class CheckUserUseCase:
             limit_connections=user.connection_limit,
             count_connections=connections,
         )
-
-
-class KillConnectionUseCase:
-    def __init__(self, connection: ConnectionKill) -> None:
-        self.connection = connection
-
-    def execute(self, username: str) -> None:
-        self.connection.kill(username)
-
-
-class AllConnectionsUseCase:
-    def __init__(self, connection: Connection) -> None:
-        self.connection = connection
-
-    def execute(self) -> int:
-        return self.connection.all()

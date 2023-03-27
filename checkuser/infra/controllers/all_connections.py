@@ -1,5 +1,5 @@
-from checkuser.domain.use_case import AllConnectionsUseCase
-from ..controller import Controller, HttpRequest, HttpResponse
+from checkuser.domain.usecases.all import AllConnectionsUseCase
+from checkuser.infra.controller import Controller, HttpRequest, HttpResponse
 
 
 class AllConnectionsController(Controller):

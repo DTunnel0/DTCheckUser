@@ -2,10 +2,11 @@ from unittest.mock import Mock
 from datetime import datetime, timedelta
 from checkuser.data.connection import ConnectionMemory
 from checkuser.data.repository import DeviceRepositoryMemory, UserRepositoryMemory
+from checkuser.domain.usecases.checkuser import CheckUserUseCase
+from checkuser.domain.usecases.kill import KillConnectionUseCase
 
 
 from checkuser.domain.user import User
-from checkuser.domain.use_case import CheckUserUseCase, KillConnectionUseCase
 from checkuser.infra.controller import HttpRequest
 from checkuser.infra.controllers.check_user import CheckUserController
 from checkuser.infra.controllers.kill_connection import KillConnectionController
@@ -14,9 +15,8 @@ from checkuser.infra.controllers.kill_connection import KillConnectionController
 def test_should_check_user():
     user_repository = UserRepositoryMemory()
     device_repository = DeviceRepositoryMemory()
-    connection = ConnectionMemory()
 
-    use_case = CheckUserUseCase(user_repository, device_repository, connection)
+    use_case = CheckUserUseCase(user_repository, device_repository)
     controller = CheckUserController(use_case)
     response = controller.handle(
         HttpRequest(

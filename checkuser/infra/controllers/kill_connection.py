@@ -1,4 +1,4 @@
-from checkuser.domain.use_case import KillConnectionUseCase
+from checkuser.domain.usecases.kill import KillConnectionUseCase
 from ..controller import Controller, HttpRequest, HttpResponse
 
 

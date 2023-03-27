@@ -1,6 +1,11 @@
 from typing import Callable
 
 from checkuser.data.database.sqlite import create_connection
+
+from checkuser.domain.usecases.all import AllConnectionsUseCase
+from checkuser.domain.usecases.checkuser import CheckUserUseCase
+from checkuser.domain.usecases.kill import KillConnectionUseCase
+
 from checkuser.infra.controller import Controller
 from checkuser.infra.controllers.check_user import CheckUserController
 from checkuser.infra.controllers.kill_connection import KillConnectionController
@@ -12,7 +17,6 @@ from checkuser.data.repository import (
     DeviceRepositorySQL,
     UserRepositoryImpl,
 )
-from checkuser.domain.use_case import CheckUserUseCase, KillConnectionUseCase, AllConnectionsUseCase
 from checkuser.data.connection import (
     AUXOpenVPNConnection,
     SSHConnection,

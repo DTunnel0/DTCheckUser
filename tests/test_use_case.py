@@ -1,14 +1,13 @@
 from checkuser.data.connection import ConnectionMemory
 from checkuser.data.repository import DeviceRepositoryMemory, UserRepositoryMemory
-from checkuser.domain.use_case import CheckUserUseCase
+from checkuser.domain.usecases.checkuser import CheckUserUseCase
 
 
 def test_should_check_user():
     user_repository = UserRepositoryMemory()
     device_repository = DeviceRepositoryMemory()
-    connection = ConnectionMemory()
 
-    use_case = CheckUserUseCase(user_repository, device_repository, connection)
+    use_case = CheckUserUseCase(user_repository, device_repository)
     data = use_case.execute('test1', 'abc123')
 
     assert data.id == 1000
@@ -18,9 +17,8 @@ def test_should_check_user():
 def test_should_test_device_limit() -> None:
     user_repository = UserRepositoryMemory()
     device_repository = DeviceRepositoryMemory()
-    connection = ConnectionMemory()
 
-    use_case = CheckUserUseCase(user_repository, device_repository, connection)
+    use_case = CheckUserUseCase(user_repository, device_repository)
     data = use_case.execute('test3', 'abc123')
 
     assert data.username == 'test3'

@@ -59,16 +59,19 @@ class DeviceRepositorySQL(DeviceRepository):
         self.sqlite.execute(cmd, (device.id, device.username))
         self.sqlite.commit()
 
-    def get_by_username(self, username: str) -> List[Device]:
+    def list_devices(self, username: str) -> List[Device]:
         cmd = 'SELECT * FROM devices WHERE username =?'
         data = self.sqlite.execute(cmd, (username,)).fetchall()
-        if not data:
-            raise ValueError('Device not found')
         return [Device(device[0], device[1]) for device in data]
 
     def count(self, username: str) -> int:
         cmd = 'SELECT COUNT(*) FROM devices WHERE username =?'
         return self.sqlite.execute(cmd, (username,)).fetchone()[0]
+
+    def delete_by_username(self, username: str) -> None:
+        cmd = 'DELETE FROM devices WHERE username =?'
+        self.sqlite.execute(cmd, (username,))
+        self.sqlite.commit()
 
 
 class DeviceRepositoryMemory(DeviceRepository):
@@ -81,8 +84,11 @@ class DeviceRepositoryMemory(DeviceRepository):
     def get_by_id(self, id: str) -> Union[Device, None]:
         return next((device for device in self.devices if device.id == id), None)
 
-    def get_by_username(self, username: str) -> List[Device]:
+    def list_devices(self, username: str) -> List[Device]:
         return [device for device in self.devices if device.username == username]
 
     def count(self, username: str) -> int:
         return len([device for device in self.devices if device.username == username])
+
+    def delete_by_username(self, username: str) -> None:
+        self.devices = [device for device in self.devices if device.username != username]

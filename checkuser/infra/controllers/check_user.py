@@ -1,7 +1,7 @@
 import datetime
 
-from checkuser.domain.use_case import CheckUserUseCase
-from ..controller import Controller, HttpRequest, HttpResponse
+from checkuser.domain.usecases.checkuser import CheckUserUseCase
+from checkuser.infra.controller import Controller, HttpRequest, HttpResponse
 
 
 class CheckUserController(Controller):
