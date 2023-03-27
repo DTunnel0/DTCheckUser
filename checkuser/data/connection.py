@@ -3,7 +3,7 @@ import re
 from typing import List
 
 from checkuser.data.executor import CommandExecutor
-from checkuser.domain.connection import Connection, ConnectionKill
+from checkuser.domain.interfaces.connection import Connection, ConnectionKill
 
 
 class SSHConnection(ConnectionKill):

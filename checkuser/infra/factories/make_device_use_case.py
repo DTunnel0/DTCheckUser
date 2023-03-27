@@ -1,5 +1,5 @@
 from checkuser.data.database.sqlite import create_connection
-from checkuser.data.repository import DeviceRepositorySQL
+from checkuser.data.repositories.device.sql import DeviceRepositorySQL
 from checkuser.domain.usecases.device.delete_by_username import DeleteByUsernameUseCase
 from checkuser.domain.usecases.device.list_all_devices import ListAllDevicesUseCase
 from checkuser.domain.usecases.device.list_by_username import ListDeviceUseCase

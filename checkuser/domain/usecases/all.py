@@ -1,4 +1,4 @@
-from checkuser.domain.connection import Connection
+from checkuser.domain.interfaces.connection import Connection
 
 
 class AllConnectionsUseCase:

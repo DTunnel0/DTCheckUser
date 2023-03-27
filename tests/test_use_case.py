@@ -1,5 +1,5 @@
-from checkuser.data.connection import ConnectionMemory
-from checkuser.data.repository import DeviceRepositoryMemory, UserRepositoryMemory
+from checkuser.data.repositories.device.memory import DeviceRepositoryMemory
+from checkuser.data.repositories.user.memory import UserRepositoryMemory
 from checkuser.domain.usecases.checkuser import CheckUserUseCase
 
 

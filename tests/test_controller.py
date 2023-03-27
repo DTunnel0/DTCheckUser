@@ -1,12 +1,10 @@
-from unittest.mock import Mock
-from datetime import datetime, timedelta
 from checkuser.data.connection import ConnectionMemory
-from checkuser.data.repository import DeviceRepositoryMemory, UserRepositoryMemory
+from checkuser.data.repositories.device.memory import DeviceRepositoryMemory
+from checkuser.data.repositories.user.memory import UserRepositoryMemory
 from checkuser.domain.usecases.checkuser import CheckUserUseCase
 from checkuser.domain.usecases.kill import KillConnectionUseCase
 
 
-from checkuser.domain.user import User
 from checkuser.infra.controller import HttpRequest
 from checkuser.infra.controllers.check_user import CheckUserController
 from checkuser.infra.controllers.kill_connection import KillConnectionController

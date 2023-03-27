@@ -1,5 +1,6 @@
 from typing import List, NamedTuple
-from checkuser.domain.repository import DeviceRepository
+
+from checkuser.domain.interfaces.device_repository import DeviceRepository
 
 
 class ListDeviceOuputDTO(NamedTuple):

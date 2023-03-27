@@ -1,6 +1,6 @@
-from checkuser.data.repository import DeviceRepositoryMemory
+from checkuser.data.repositories.device.memory import DeviceRepositoryMemory
+from checkuser.domain.entities.device import Device
 from checkuser.domain.usecases.device.list_all_devices import ListAllDevicesUseCase
-from checkuser.domain.user import Device
 
 
 def test_list_all_devices() -> None:

@@ -1,9 +1,9 @@
 import datetime
 
 from typing import Union, NamedTuple
-from checkuser.domain.connection import Connection
-from checkuser.domain.repository import UserRepository, DeviceRepository
-from checkuser.domain.user import Device
+from checkuser.domain.entities.device import Device
+from checkuser.domain.interfaces.device_repository import DeviceRepository
+from checkuser.domain.interfaces.user_repository import UserRepository
 
 
 class OutputDTO(NamedTuple):

@@ -1,6 +1,6 @@
-from checkuser.data.repository import DeviceRepositoryMemory
+from checkuser.data.repositories.device.memory import DeviceRepositoryMemory
+from checkuser.domain.entities.device import Device
 from checkuser.domain.usecases.device.delete_by_username import DeleteByUsernameUseCase
-from checkuser.domain.user import Device
 
 
 def test_deve_deletar_todos_os_devices_apartir_de_um_usuario() -> None:

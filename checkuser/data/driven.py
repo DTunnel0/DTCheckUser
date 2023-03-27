@@ -10,7 +10,7 @@ from checkuser.data.executor import CommandExecutor
 logger = logging.getLogger(__name__)
 
 
-class Driver(metaclass=ABCMeta):
+class Driven(metaclass=ABCMeta):
     @abstractmethod
     def get_id(self, username: str) -> int:
         raise NotImplementedError
@@ -44,7 +44,7 @@ class FormatDateBR(FormatDate):
         return datetime.datetime.strptime(date, '%b %d, %Y')
 
 
-class DriverImpl(Driver):
+class DrivenImpl(Driven):
     def __init__(self, executor: CommandExecutor, format_date: FormatDate):
         self.executor = executor
         self.format_date = format_date
@@ -66,13 +66,13 @@ class DriverImpl(Driver):
 
     def get_connection_limit(self, username: str) -> int:
         try:
-            try:
-                logger.debug('Checking limit with DTunnelManager')
-                cmd = 'vps view -u {} | grep limit: | cut -d\' \' -f2'.format(username)
-                return int(self.executor.execute(cmd))
-            except Exception:
-                logger.debug('DTunnelManager not found')
+            logger.debug('Checking limit with DTunnelManager')
+            cmd = 'vps view -u {} | grep limit: | cut -d\' \' -f2'.format(username)
+            return int(self.executor.execute(cmd))
+        except Exception:
+            logger.debug('DTunnelManager not found')
 
+        try:
             archive = '/root/usuarios.db'
             logger.debug('Checking limit with {}'.format(archive))
             with open(archive) as f:
@@ -89,7 +89,7 @@ class DriverImpl(Driver):
         return re.findall(r'^([^:]+):', output, re.MULTILINE)
 
 
-class DriverMemory(Driver):
+class DrivenMemory(Driven):
     def __init__(self) -> None:
         self.users: List[dict] = [
             {

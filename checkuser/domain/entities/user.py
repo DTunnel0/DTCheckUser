@@ -10,8 +10,3 @@ class User(NamedTuple):
 
     def limit_reached(self, devices: int) -> bool:
         return devices >= self.connection_limit
-
-
-class Device(NamedTuple):
-    id: str
-    username: str

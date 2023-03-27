@@ -1,10 +1,9 @@
-from checkuser.data.driver import DriverMemory
-
-from checkuser.data.repository import UserRepositoryImpl
+from checkuser.data.repositories.user.impl import UserRepositoryImpl
+from checkuser.data.driven import DrivenMemory
 
 
 def test_should_get_user_by_username():
-    driver = DriverMemory()
+    driver = DrivenMemory()
     repository = UserRepositoryImpl(driver)
 
     username = 'test'

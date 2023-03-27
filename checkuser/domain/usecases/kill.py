@@ -1,4 +1,4 @@
-from checkuser.domain.connection import ConnectionKill
+from checkuser.domain.interfaces.connection import ConnectionKill
 
 
 class KillConnectionUseCase:

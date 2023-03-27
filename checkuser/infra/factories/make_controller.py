@@ -1,6 +1,8 @@
 from typing import Callable
 
 from checkuser.data.database.sqlite import create_connection
+from checkuser.data.repositories.device.sql import DeviceRepositorySQL
+from checkuser.data.repositories.user.impl import UserRepositoryImpl
 
 from checkuser.domain.usecases.all import AllConnectionsUseCase
 from checkuser.domain.usecases.checkuser import CheckUserUseCase
@@ -12,8 +14,7 @@ from checkuser.infra.controllers.kill_connection import KillConnectionController
 from checkuser.infra.controllers.all_connections import AllConnectionsController
 
 from checkuser.data.executor import CommandExecutorImpl
-from checkuser.data.driver import DriverImpl, FormatDateUS
-from checkuser.data.repository import DeviceRepositorySQL, UserRepositoryImpl
+from checkuser.data.driven import DrivenImpl, FormatDateUS
 from checkuser.data.connection import (
     AUXOpenVPNConnection,
     SSHConnection,
@@ -25,7 +26,7 @@ from checkuser.data.connection import (
 
 def make_controller() -> CheckUserController:
     user_repository = UserRepositoryImpl(
-        DriverImpl(
+        DrivenImpl(
             CommandExecutorImpl(),
             FormatDateUS(),
         ),
