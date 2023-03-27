@@ -13,6 +13,16 @@ class OutputDTO(NamedTuple):
     limit_connections: int
     count_connections: int
 
+    def string_date(self) -> Union[None, str]:
+        if self.expiration_date is None:
+            return None
+        return self.expiration_date.strftime('%d/%m/%Y')
+
+    def days(self) -> Union[None, int]:
+        if self.expiration_date is None:
+            return None
+        return (datetime.datetime.now() - self.expiration_date).days + 1
+
 
 class CheckUserUseCase:
     def __init__(
