@@ -16,7 +16,7 @@ class UserRepository(metaclass=ABCMeta):
 
 class DeviceRepository(metaclass=ABCMeta):
     @abstractmethod
-    def get_by_id(self, id: str) -> Union[Device, None]:
+    def exists(self, id: str) -> bool:
         raise NotImplementedError
 
     @abstractmethod

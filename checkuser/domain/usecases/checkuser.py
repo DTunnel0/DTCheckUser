@@ -37,7 +37,7 @@ class CheckUserUseCase:
         user = self.user_repository.get(username)
         devices = self.device_repository.count(username)
 
-        device_exists = self.device_repository.get_by_id(device_id) is not None
+        device_exists = self.device_repository.exists(device_id)
         limit_reached = not device_exists and user.limit_reached(devices)
 
         if not device_exists and not limit_reached:

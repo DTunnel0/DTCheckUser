@@ -49,27 +49,27 @@ class DeviceRepositorySQL(DeviceRepository):
     def __init__(self, conn: sqlite3.Connection):
         self.sqlite = conn
 
-    def get_by_id(self, id: str) -> Union[Device, None]:
-        cmd = 'SELECT * FROM devices WHERE id = ?'
+    def exists(self, id: str) -> bool:
+        cmd = 'SELECT * FROM devices WHERE device_id = ?'
         data = self.sqlite.execute(cmd, (id,)).fetchall()
-        return Device(data[0][0], data[0][1]) if data else None
+        return bool(data)
 
     def save(self, device: Device) -> None:
-        cmd = 'INSERT INTO devices (id, username) VALUES (?,?)'
+        cmd = 'INSERT INTO devices (device_id, username) VALUES (?,?)'
         self.sqlite.execute(cmd, (device.id, device.username))
         self.sqlite.commit()
 
     def list_devices(self, username: str) -> List[Device]:
-        cmd = 'SELECT * FROM devices WHERE username =?'
+        cmd = 'SELECT * FROM devices WHERE username = ?'
         data = self.sqlite.execute(cmd, (username,)).fetchall()
         return [Device(device[0], device[1]) for device in data]
 
     def count(self, username: str) -> int:
-        cmd = 'SELECT COUNT(*) FROM devices WHERE username =?'
+        cmd = 'SELECT COUNT(*) FROM devices WHERE username = ?'
         return self.sqlite.execute(cmd, (username,)).fetchone()[0]
 
     def delete_by_username(self, username: str) -> None:
-        cmd = 'DELETE FROM devices WHERE username =?'
+        cmd = 'DELETE FROM devices WHERE username = ?'
         self.sqlite.execute(cmd, (username,))
         self.sqlite.commit()
 
@@ -81,8 +81,8 @@ class DeviceRepositoryMemory(DeviceRepository):
     def save(self, device: Device) -> None:
         self.devices.append(device)
 
-    def get_by_id(self, id: str) -> Union[Device, None]:
-        return next((device for device in self.devices if device.id == id), None)
+    def exists(self, id: str) -> Union[Device, None]:
+        return any(device for device in self.devices if device.id == id)
 
     def list_devices(self, username: str) -> List[Device]:
         return [device for device in self.devices if device.username == username]
