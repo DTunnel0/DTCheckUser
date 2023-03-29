@@ -18,8 +18,8 @@ class Connection(metaclass=ABCMeta):
         raise NotImplementedError
 
 
-class ConnectionKill(Connection):
-    _next_handler: Union['ConnectionKill', None] = None
+class ConnectionKiller(Connection):
+    _next_handler: Union['ConnectionKiller', None] = None
 
     @abstractmethod
     def kill(self, username: str) -> None:

@@ -1,5 +1,3 @@
-import datetime
-
 from checkuser.domain.usecases.checkuser import CheckUserUseCase
 from checkuser.infra.controller import Controller, HttpRequest, HttpResponse
 
@@ -15,8 +13,8 @@ class CheckUserController(Controller):
             body={
                 'id': data.id,
                 'username': data.username,
-                'expiration_date': data.string_date(),
-                'expiration_days': data.days(),
+                'expiration_date': data.get_date_string(),
+                'expiration_days': data.get_days_from_date(),
                 'limit_connections': data.limit_connections,
                 'count_connections': data.count_connections,
             },

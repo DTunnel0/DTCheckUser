@@ -1,6 +1,6 @@
-import datetime
-
+from datetime import datetime
 from typing import Union, NamedTuple
+
 from checkuser.domain.entities.device import Device
 from checkuser.domain.interfaces.device_repository import DeviceRepository
 from checkuser.domain.interfaces.user_repository import UserRepository
@@ -9,19 +9,19 @@ from checkuser.domain.interfaces.user_repository import UserRepository
 class OutputDTO(NamedTuple):
     id: int
     username: str
-    expiration_date: Union[None, datetime.datetime]
+    expiration_date: Union[None, datetime]
     limit_connections: int
     count_connections: int
 
-    def string_date(self) -> Union[None, str]:
+    def get_date_string(self) -> Union[None, str]:
         if self.expiration_date is None:
             return None
         return self.expiration_date.strftime('%d/%m/%Y')
 
-    def days(self) -> Union[None, int]:
+    def get_days_from_date(self) -> Union[None, int]:
         if self.expiration_date is None:
             return None
-        return (self.expiration_date - datetime.datetime.now()).days + 1
+        return (self.expiration_date - datetime.now()).days + 1
 
 
 class CheckUserUseCase:

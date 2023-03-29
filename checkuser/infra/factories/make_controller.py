@@ -16,7 +16,7 @@ from checkuser.infra.controllers.all_connections import AllConnectionsController
 from checkuser.data.executor import CommandExecutorImpl
 from checkuser.data.driven import DrivenImpl, FormatDateUS
 from checkuser.data.connection import (
-    AUXOpenVPNConnection,
+    AUXOpenVPNConnectionImpl,
     SSHConnection,
     OpenVPNConnection,
     V2rayConnection,
@@ -44,7 +44,7 @@ def make_controller() -> CheckUserController:
 
 def make_kill_controller() -> KillConnectionController:
     cmd = CommandExecutorImpl()
-    aux = AUXOpenVPNConnection()
+    aux = AUXOpenVPNConnectionImpl()
     ssh = SSHConnection(cmd)
     ssh.set_next_handler(OpenVPNConnection(aux))
     return KillConnectionController(KillConnectionUseCase(ssh))
@@ -52,7 +52,7 @@ def make_kill_controller() -> KillConnectionController:
 
 def make_all_controller() -> AllConnectionsController:
     cmd = CommandExecutorImpl()
-    aux = AUXOpenVPNConnection()
+    aux = AUXOpenVPNConnectionImpl()
     v2 = V2RayService(CommandExecutorImpl())
 
     ssh = SSHConnection(cmd)

@@ -1,12 +1,14 @@
 import socket
 import re
+
+from abc import ABCMeta, abstractmethod
 from typing import List
 
 from checkuser.data.executor import CommandExecutor
-from checkuser.domain.interfaces.connection import Connection, ConnectionKill
+from checkuser.domain.interfaces.connection import Connection, ConnectionKiller
 
 
-class SSHConnection(ConnectionKill):
+class SSHConnection(ConnectionKiller):
     def __init__(self, executor: CommandExecutor):
         self.executor = executor
 
@@ -32,12 +34,41 @@ class SSHConnection(ConnectionKill):
         return all
 
 
-class AUXOpenVPNConnection:
+class AUXOpenVPNConnection(metaclass=ABCMeta):
+    @abstractmethod
+    def connect(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def send(self, data: str) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def receive(self, size: int = 1024) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def close(self) -> None:
+        raise NotImplementedError
+
+    def __enter__(self) -> 'AUXOpenVPNConnection':
+        self.connect()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self.close()
+
+
+class AUXOpenVPNConnectionImpl(AUXOpenVPNConnection):
     __socket: socket.socket
 
     def __init__(self, host: str = '127.0.0.1', port: int = 7505) -> None:
         self.host = host
         self.port = port
+
+    def connect(self) -> None:
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__socket.connect((self.host, self.port))
 
     def send(self, data: str) -> None:
         self.__socket.send(data.encode())
@@ -54,16 +85,8 @@ class AUXOpenVPNConnection:
     def close(self) -> None:
         self.__socket.close()
 
-    def __enter__(self) -> 'AUXOpenVPNConnection':
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__socket.connect((self.host, self.port))
-        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        self.close()
-
-
-class OpenVPNConnection(ConnectionKill):
+class OpenVPNConnection(ConnectionKiller):
     def __init__(self, connection: AUXOpenVPNConnection) -> None:
         self.connection = connection
 
@@ -167,7 +190,7 @@ class V2rayConnection(Connection):
         return all
 
 
-class ConnectionMemory(ConnectionKill):
+class ConnectionMemory(ConnectionKiller):
     def __init__(self):
         self.users: List[dict] = [
             {
