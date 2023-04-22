@@ -5,16 +5,17 @@ class ListDevicesPresenter:
     def __init__(self, list_devices_use_case: ListDeviceUseCase) -> None:
         self.list_devices_use_case = list_devices_use_case
 
-    def present(self, username: str) -> None:
+    def present(self, username: str) -> str:
         data = self.list_devices_use_case.execute(username)
 
         if not data:
-            print('Devices not founds')
-            return
+            return 'Devices not founds'
 
-        print('-' * 50)
-        print('{0:<33} {1}'.format('ID', 'NOME DE USUARIO'))
-        print('-' * 50)
+        message = '-' * 50 + '\n'
+        message += '{0:<33} {1}'.format('ID', 'NOME DE USUARIO') + '\n'
+        message += '-' * 50 + '\n'
         for device in data:
-            print('%-33s %s ' % (device.id, device.username))
-            print('-' * 50)
+            message += '%-33s %s ' % (device.id, device.username) + '\n'
+            message += '-' * 50
+
+        return message

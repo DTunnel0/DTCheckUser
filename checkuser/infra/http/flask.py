@@ -5,8 +5,12 @@ from checkuser.infra.adapter import FlaskAdpater
 from checkuser.utils.page import get_page_content
 
 app = Flask(__name__)
+
+
 app.config['DEBUG'] = True
-app.config['JSON_SORT_KEYS'] = False
+
+app.json.sort_keys = False
+
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.config['SECRET_KEY'] = 'secret!'
 

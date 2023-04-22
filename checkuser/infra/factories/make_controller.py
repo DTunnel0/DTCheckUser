@@ -13,8 +13,8 @@ from checkuser.infra.controllers.check_user import CheckUserController
 from checkuser.infra.controllers.kill_connection import KillConnectionController
 from checkuser.infra.controllers.all_connections import AllConnectionsController
 
-from checkuser.data.executor import CommandExecutorImpl
-from checkuser.data.driven import DrivenImpl, FormatDateUS
+from checkuser.data.executor import CommandExecutorFactory
+from checkuser.data.driven import DrivenFactory
 from checkuser.data.connection import (
     AUXOpenVPNConnectionImpl,
     SSHConnection,
@@ -25,13 +25,7 @@ from checkuser.data.connection import (
 
 
 def make_controller() -> CheckUserController:
-    user_repository = UserRepositoryImpl(
-        DrivenImpl(
-            CommandExecutorImpl(),
-            FormatDateUS(),
-        ),
-    )
-
+    user_repository = UserRepositoryImpl(DrivenFactory.create())
     device_repository = DeviceRepositorySQL(create_connection())
 
     return CheckUserController(
@@ -43,7 +37,7 @@ def make_controller() -> CheckUserController:
 
 
 def make_kill_controller() -> KillConnectionController:
-    cmd = CommandExecutorImpl()
+    cmd = CommandExecutorFactory.create()
     aux = AUXOpenVPNConnectionImpl()
     ssh = SSHConnection(cmd)
     ssh.set_next_handler(OpenVPNConnection(aux))
@@ -51,9 +45,9 @@ def make_kill_controller() -> KillConnectionController:
 
 
 def make_all_controller() -> AllConnectionsController:
-    cmd = CommandExecutorImpl()
+    cmd = CommandExecutorFactory.create()
     aux = AUXOpenVPNConnectionImpl()
-    v2 = V2RayService(CommandExecutorImpl())
+    v2 = V2RayService(cmd)
 
     ssh = SSHConnection(cmd)
     ssh.set_next_handler(OpenVPNConnection(aux)).set_next_handler(V2rayConnection(v2))

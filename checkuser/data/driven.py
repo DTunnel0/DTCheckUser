@@ -1,11 +1,13 @@
 import datetime
 import re
 import logging
+import os
 
 from abc import ABCMeta, abstractmethod
 from typing import Union, List
 
 from checkuser.data.executor import CommandExecutor
+from checkuser.data.executor import CommandExecutorFactory
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +69,7 @@ class DrivenImpl(Driven):
     def get_connection_limit(self, username: str) -> int:
         try:
             logger.debug('Checking limit with DTunnelManager')
-            cmd = 'vps view -u {} | grep limit: | cut -d\' \' -f2'.format(username)
+            cmd = 'vps view -u {} | grep connection_limit: | cut -d\' \' -f2'.format(username)
             return int(self.executor.execute(cmd))
         except Exception:
             logger.debug('DTunnelManager not found')
@@ -78,10 +80,10 @@ class DrivenImpl(Driven):
             with open(archive) as f:
                 data = f.read()
                 search = re.search(r'{}\s+(\d+)'.format(username), data)
-                return int(search.group(1)) if search else 0
+                return int(search.group(1)) if search else 1
         except Exception as err:
             logger.exception(err)
-            return 0
+            return 1
 
     def get_users(self) -> List[str]:
         command = 'cat /etc/passwd'
@@ -105,7 +107,7 @@ class DrivenMemory(Driven):
         for user in self.users:
             if user['username'] == username:
                 return user['id']
-        return -1
+        raise ValueError('Could not find')
 
     def get_expiration_date(self, username: str) -> Union[datetime.datetime, None]:
         for user in self.users:
@@ -121,3 +123,13 @@ class DrivenMemory(Driven):
 
     def get_users(self) -> List[str]:
         return [user['username'] for user in self.users]
+
+
+class DrivenFactory:
+    @staticmethod
+    def create() -> Driven:
+        return (
+            DrivenImpl(CommandExecutorFactory.create(), FormatDateUS())
+            if os.getenv('DRIVEN_ENV') != 'TEST'
+            else DrivenMemory()
+        )

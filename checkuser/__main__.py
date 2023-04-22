@@ -42,17 +42,17 @@ def main(debug: bool = os.getenv('APP_DEBUG') == '1') -> None:
 
     if data.list_all_devices:
         presenter = ListAllDevicesPresenter(make_list_all_devices_use_case())
-        presenter.present()
+        print(presenter.present())
         return
 
     if data.list_devices:
         presenter = ListDevicesPresenter(make_list_devices_use_case())
-        presenter.present(data.list_devices)
+        print(presenter.present(data.list_devices))
         return
 
     if data.delete_devices:
         presenter = DeleteDevicesPresenter(make_delete_devices_use_case())
-        presenter.present(data.delete_devices)
+        print(presenter.present(data.delete_devices))
         return
 
     if data.delete_db:
