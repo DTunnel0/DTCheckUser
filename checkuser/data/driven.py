@@ -68,11 +68,11 @@ class DrivenImpl(Driven):
 
     def get_connection_limit(self, username: str) -> int:
         try:
-            logger.debug('Checking limit with DTunnelManager')
+            logger.info('Checking limit with DTunnelManager')
             cmd = 'vps view -u {} | grep connection_limit: | cut -d\' \' -f2'.format(username)
             return int(self.executor.execute(cmd))
-        except Exception:
-            logger.debug('DTunnelManager not found')
+        except Exception as err:
+            logger.exception(err)
 
         try:
             archive = '/root/usuarios.db'
