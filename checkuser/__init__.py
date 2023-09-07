@@ -8,7 +8,7 @@ except Exception:
 
 logger = logging.getLogger(__name__)
 
-__version__ = '1.4.7'
+__version__ = '1.5.1'
 __author__ = 'Glemison C. Dutra'
 __email__ = 'glemyson20@gmail.com'
 

@@ -52,8 +52,12 @@ class DrivenImpl(Driven):
         self.format_date = format_date
 
     def get_id(self, username: str) -> int:
-        command = 'id -u {}'.format(username)
-        return int(self.executor.execute(command))
+        try:
+            command = 'id -u {}'.format(username)
+            return int(self.executor.execute(command))
+        except Exception as err:
+            logger.exception(err)
+            return -1
 
     def get_expiration_date(self, username: str) -> Union[datetime.datetime, None]:
         try:

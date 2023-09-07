@@ -17,4 +17,4 @@ class UserRepositoryImpl(UserRepository):
 
     def get_all(self) -> List[User]:
         users = self.driver.get_users()
-        return [self.get_by_username(user) for user in users]
+        return [self.get(user) for user in users]
