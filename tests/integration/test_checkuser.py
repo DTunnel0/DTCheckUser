@@ -5,12 +5,13 @@ os.environ['DRIVEN_ENV'] = 'TEST'
 
 from flask.testing import FlaskClient
 
-from checkuser.infra.http.flask import app
+from checkuser.infra.main import create_app
 from checkuser.data.database.sqlite import delete_database
 
 
 @pytest.fixture()
 def client():
+    app = create_app()
     app.config.update({'TESTING': True})
     return app.test_client()
 

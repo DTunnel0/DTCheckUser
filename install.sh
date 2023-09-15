@@ -64,7 +64,6 @@ function start_checkuser() {
     addr=$(curl -s icanhazip.com)
 
     echo 'URL: http://'$addr':'$port''
-    echo 'WS: ws://'$addr':'$port''
     read
 }
 
