@@ -4,7 +4,7 @@ page = '''<!DOCTYPE HTML>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CHECKUSER</title>
+    <title>DT - CHECKUSER</title>
 
     <style>
         @import url(https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900);
@@ -26,61 +26,69 @@ page = '''<!DOCTYPE HTML>
         }
 
         .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin: 1rem;
             border-radius: 50px;
             border: none;
             background: rgb(39, 39, 39);
             width: 300px;
             padding: 30px;
+            box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
         }
 
         .container h1 {
-            color: white;
+            color: #FFF;
             font-size: 1.5rem;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
 
         .container h4 {
-            color: white;
+            color: #FFF;
             font-size: 1rem;
             margin-bottom: 20px;
         }
 
-        .container h4 span {
+        .container .container-count {
+            width: 80px;
+            height: 80px;
+            color: #FFF;
             background: #363636;
-            padding: 5px;
-            border-radius: 50px;
-            font-size: 0.8rem;
+            padding: 1rem;
+            border-radius: 50%;
+            font-size: 3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
-
 </head>
 
 <body>
     <div class="container">
         <h1>CHECKUSER - @DuTra01</h1>
-        <h4>TOTAL DE CONEXÕES: <span id="total">00</span></h4>
+        <h4>TOTAL DE CONEXÕES</h4>
+        <div class="container-count">
+            <span id="total">00</span>
+        </div>
     </div>
+    <script>
+        const url = `ws://${window.location.host}`;
+        const socket = new WebSocket(url);
 
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
-        integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-    <script src="https://cdn.socket.io/4.5.3/socket.io.min.js"
-        integrity="sha384-WPFUvHkB1aHA5TDSZi6xtDgkF0wXJcIIxXhC6h8OT8EH3fC5PWro5pWJ1THjcfEi"
-        crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function () {
-            const socket = io();
-            socket.on('message', function (data) {
-                data = JSON.parse(data);
-                if (data.total != undefined) {
-                    $('#total').text(String(data.total).padStart(2, '0'));
-                }
-            });
-
-            socket.emit('message', {
+        socket.addEventListener('open', (event) => {
+            socket.send(JSON.stringify({
                 action: 'all',
-                data: null
-            });
+                data: null,
+            }));
+        });
+
+        socket.addEventListener('message', (event) => {
+            const data = JSON.parse(event.data);
+            if (data.total != undefined) {
+                document.querySelector('#total').innerHTML = String(data.total).padStart(2, '0')
+            }
         });
     </script>
 </body>
